@@ -1,2726 +1,381 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-      <title>Safe Haven - مساحتك الآمنة للدعم النفسي</title>
-    <meta name="description" content="موقع Safe Haven هو مساحتك الآمنة للصحة النفسية. نوفر الدعم والهدوء وموارد تساعدك على تجاوز القلق والاكتئاب.">
-    <meta name="keywords" content="صحة نفسية, دعم نفسي, اكتئاب, قلق, راحة نفسية, Safe Haven, فضفضة">
-    
-    <!-- بيانات المشاركة -->
-    <meta property="og:title" content="Safe Haven - مساحتك الآمنة">
-    <meta property="og:description" content="مساحة هادئة لدعم صحتك النفسية.. ادخل وخذ نفساً عميقاً.">
-    <meta property="og:url" content="https://sakina-space.github.io/safe-haven.com/">
-    <meta property="og:type" content="website">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
-    
-    * {
-      font-family: 'Tajawal', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    
-    /* Enable text selection for inputs */
-    input, textarea {
-      -webkit-user-select: text;
-      user-select: text;
-    }
-
-    :root {
-      --primary: #7c8db0;
-      --primary-dark: #5a6a8a;
-      --accent: #9cb4cc;
-      --soft-bg: rgba(30, 41, 59, 0.7);
-    }
-
-    body {
-      background: #0a0f1a;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* خلفية الليل مع الجبال */
-    .night-sky {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(180deg, 
-        #050810 0%, 
-        #0a0f1a 20%, 
-        #111827 50%, 
-        #1a2332 80%,
-        #243447 100%
-      );
-      z-index: -10;
-    }
-
-    /* النجوم */
-    .stars {
-      position: fixed;
-      inset: 0;
-      z-index: -9;
-    }
-
-    .star {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle ease-in-out infinite;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      25% { opacity: 0.6; }
-      50% { opacity: 1; transform: scale(1.3); }
-      75% { opacity: 0.5; }
-    }
-
-    /* الجبال */
-    .mountains {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 35vh;
-      z-index: -8;
-      background: 
-        linear-gradient(135deg, transparent 50%, rgba(20, 30, 45, 0.3) 50%),
-        linear-gradient(225deg, transparent 50%, rgba(15, 25, 40, 0.3) 50%);
-      background-size: 20px 20px;
-    }
-
-    .mountain {
-      position: absolute;
-      bottom: 0;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      filter: drop-shadow(0 0 30px rgba(0,0,0,0.5));
-    }
-
-    .mountain-1 {
-      right: -5%;
-      border-width: 0 45vw 30vh 45vw;
-      border-color: transparent transparent #0d1520 transparent;
-    }
-
-    .mountain-2 {
-      right: 15%;
-      border-width: 0 35vw 22vh 35vw;
-      border-color: transparent transparent #151e2e transparent;
-    }
-
-    .mountain-3 {
-      right: 35%;
-      border-width: 0 40vw 25vh 40vw;
-      border-color: transparent transparent #0f1823 transparent;
-    }
-
-    .mountain-4 {
-      left: -15%;
-      border-width: 0 55vw 32vh 55vw;
-      border-color: transparent transparent #0d1520 transparent;
-    }
-
-    /* الغيوم */
-    .clouds {
-      position: fixed;
-      top: 5%;
-      left: 0;
-      right: 0;
-      height: 35%;
-      z-index: -7;
-      overflow: hidden;
-    }
-
-    .cloud {
-      position: absolute;
-      background: rgba(60, 75, 95, 0.35);
-      border-radius: 50%;
-      filter: blur(40px);
-      animation: float-cloud linear infinite;
-    }
-
-    @keyframes float-cloud {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(120vw); }
-    }
-
-    /* المطر */
-    .rain-container {
-      position: fixed;
-      inset: 0;
-      z-index: -6;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .rain-drop {
-      position: absolute;
-      background: linear-gradient(to bottom, transparent, rgba(160, 180, 200, 0.5), rgba(130, 150, 170, 0.3));
-      animation: rain-fall linear infinite;
-      border-radius: 0 0 50% 50%;
-    }
-
-    @keyframes rain-fall {
-      0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
-      10% { opacity: 0.7; }
-      90% { opacity: 0.4; }
-      100% { transform: translateY(110vh) translateX(-30px); opacity: 0; }
-    }
-
-    /* البرق */
-    .lightning {
-      position: fixed;
-      inset: 0;
-      z-index: -5;
-      pointer-events: none;
-      opacity: 0;
-      background: 
-        radial-gradient(ellipse at 30% 0%, rgba(255, 255, 255, 0.8) 0%, rgba(200, 210, 255, 0.2) 40%, transparent 70%),
-        radial-gradient(ellipse at 70% 10%, rgba(255, 255, 255, 0.5) 0%, rgba(180, 200, 255, 0.15) 30%, transparent 60%);
-    }
-
-    /* البطاقات */
-    .glass-card {
-      background: rgba(30, 41, 59, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .glass-card:hover {
-      border-color: rgba(148, 163, 184, 0.4);
-      transform: translateY(-2px);
-    }
-
-    /* الأزرار */
-    .soft-btn {
-      background: rgba(124, 141, 176, 0.3);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      color: #e2e8f0;
-      transition: background 0.15s ease, transform 0.1s ease;
-      will-change: transform;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .soft-btn:hover {
-      background: rgba(124, 141, 176, 0.5);
-    }
-
-    .soft-btn:active {
-      transform: scale(0.95);
-      background: rgba(124, 141, 176, 0.6);
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, #7c8db0, #5a6a8a);
-      color: white;
-      transition: background 0.15s ease, transform 0.1s ease;
-      will-change: transform;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .primary-btn:hover {
-      filter: brightness(1.1);
-    }
-
-    .primary-btn:active {
-      transform: scale(0.95);
-      filter: brightness(1.15);
-    }
-
-    /* المحادثة */
-    .chat-container {
-      height: 450px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-    }
-
-    .chat-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.3);
-      border-radius: 10px;
-    }
-
-    .user-msg {
-      background: linear-gradient(135deg, rgba(124, 141, 176, 0.5), rgba(90, 106, 138, 0.4));
-      border-radius: 20px 20px 5px 20px;
-    }
-
-    .ai-msg {
-      background: linear-gradient(135deg, rgba(71, 85, 105, 0.6), rgba(55, 65, 81, 0.5));
-      border-radius: 20px 20px 20px 5px;
-    }
-
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: #9cb4cc;
-      border-radius: 50%;
-      display: inline-block;
-      margin: 0 2px;
-      animation: bounce 1.4s infinite ease-in-out;
-    }
-
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-    }
-
-    /* تنفس */
-    .breath-circle {
-      transition: all 4s ease-in-out;
-    }
-
-    /* اقتباس */
-    .quote-card {
-      background: linear-gradient(135deg, rgba(124, 141, 176, 0.3), rgba(71, 85, 105, 0.4));
-    }
-
-    /* الألعاب */
-    .game-card {
-      cursor: pointer;
-      transition: all 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .game-card:hover {
-      transform: scale(1.05);
-    }
-
-    .memory-card {
-      width: 70px;
-      height: 70px;
-      perspective: 1000px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .memory-card-inner {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.3s;
-      transform-style: preserve-3d;
-    }
-
-    .memory-card.flipped .memory-card-inner {
-      transform: rotateY(180deg);
-    }
-
-    .memory-card-front, .memory-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-
-    .memory-card-front {
-      background: rgba(124, 141, 176, 0.5);
-    }
-
-    .memory-card-back {
-      background: rgba(71, 85, 105, 0.7);
-      transform: rotateY(180deg);
-    }
-    
-    /* تحسين سرعة جميع عناصر التفاعل */
-    * {
-      -webkit-tap-highlight-color: transparent !important;
-    }
-    
-    button, a, input, textarea {
-      -webkit-tap-highlight-color: transparent !important;
-      touch-action: manipulation;
-    }
-
-    /* تأثير الظهور */
-    .fade-in {
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* قائمة الجوال */
-    .mobile-menu {
-      transform: translateX(100%);
-      transition: transform 0.15s ease-out;
-    }
-
-    .mobile-menu.open {
-      transform: translateX(0);
-    }
-
-    /* زر إغلاق القائمة - استجابة فورية */
-    #closeMenu {
-      transition: none !important;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    #closeMenu:active {
-      transform: scale(0.85);
-    }
-    
-    /* جميع الروابط في القائمة - استجابة فورية */
-    #mobileMenu a {
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    #mobileMenu a:active {
-      transform: scale(0.98);
-    }
-
-    /* Smooth scroll */
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Selection */
-    ::selection {
-      background: rgba(124, 141, 176, 0.5);
-      color: white;
-    }
-
-    /* تمارين جديدة */
-    .exercise-card {
-      transition: all 0.3s ease;
-    }
-
-    .exercise-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .exercise-card.active {
-      border-color: #7c8db0;
-      background: rgba(124, 141, 176, 0.2);
-    }
-
-    /* لعبة ترتيب الأرقام */
-    .number-tile {
-      width: 60px;
-      height: 60px;
-      background: rgba(124, 141, 176, 0.5);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-
-    .number-tile:hover {
-      transform: scale(1.1);
-      background: rgba(124, 141, 176, 0.7);
-    }
-
-    .number-tile:active {
-      transform: scale(0.95);
-    }
-
-    .number-tile.correct {
-      background: rgba(74, 222, 128, 0.5);
-    }
-
-    /* لعبة الكلمات الإيجابية */
-    .word-bubble {
-      display: inline-block;
-      padding: 10px 20px;
-      background: rgba(124, 141, 176, 0.3);
-      border-radius: 20px;
-      margin: 5px;
-      cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-      font-size: 14px;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-
-    .word-bubble:hover {
-      transform: scale(1.1);
-      background: rgba(124, 141, 176, 0.5);
-    }
-
-    .word-bubble:active {
-      transform: scale(0.95);
-    }
-
-    .word-bubble.selected {
-      background: rgba(74, 222, 128, 0.5);
-    }
-
-    /* لعبة البازل */
-    .puzzle-piece {
-      cursor: move;
-      transition: transform 0.2s ease;
-    }
-
-    .puzzle-piece:hover {
-      transform: scale(1.05);
-      z-index: 10;
-    }
-
-    /* مؤشر التنفس */
-    .breath-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 3px solid rgba(124, 141, 176, 0.5);
-      transition: all 4s ease-in-out;
-    }
-
-    /* خطوات التمرين */
-    .step-indicator {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      margin-top: 15px;
-    }
-
-    .step-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(148, 163, 184, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .step-dot.active {
-      background: #7c8db0;
-      transform: scale(1.3);
-    }
-
-    .step-dot.completed {
-      background: rgba(74, 222, 128, 0.7);
-    }
-
-    /* رسالة التقدم */
-    .progress-message {
-      min-height: 30px;
-      text-align: center;
-      color: #9cb4cc;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    /* لعبة الألوان */
-    .color-circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .color-circle:hover {
-      transform: scale(1.2);
-    }
-
-    /* لعبة الفرق */
-    .difference-container {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .difference-image {
-      width: 200px;
-      height: 150px;
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-      border-radius: 10px;
-      position: relative;
-      cursor: crosshair;
-    }
-
-    .difference-spot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-      animation: glow 1.5s infinite;
-    }
-
-    @keyframes glow {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.8; }
-    }
-
-    .difference-spot.found {
-      background: rgba(74, 222, 128, 0.7) !important;
-      animation: none;
-    }
-
-    /* عداد الوقت */
-    .timer {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #9cb4cc;
-      text-align: center;
-      margin: 10px 0;
-    }
-
-    /* شاشة النتيجة */
-    .result-screen {
-      text-align: center;
-      padding: 30px;
-    }
-
-    .result-score {
-      font-size: 3rem;
-      font-weight: bold;
-      color: #74dc80;
-      margin: 20px 0;
-    }
-
-    /* تأثيرات الاحتفال */
-    .confetti {
-      position: fixed;
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    /* تخصيص شريط التمرير */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(30, 41, 59, 0.5);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(124, 141, 176, 0.5);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(124, 141, 176, 0.7);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقعي الآمن - PWA</title>
+
+    <!-- ربط ملف manifest.json الخاص بالـ PWA -->
+    <!-- المسار يجب أن يشمل اسم الريبو على GitHub Pages -->
+    <link rel="manifest" href="/safe-haven.com/manifest.json">
+
+    <!-- تحديد لون شريط المتصفح ليتناسب مع تصميم PWA (من manifest.json) -->
+    <meta name="theme-color" content="#007bff">
+
+    <!-- كود ملف قوقل (مثال: Google Site Verification) -->
+    <!-- إذا كان ملفك هو 'googlec5f6c58e64a8bd8e.html' فقط ضعه في المجلد الرئيسي لموقعك ولا حاجة لكتابة كود هنا. -->
+    <!-- إذا كان كود تأكيد مثل هذا الميتا تاج، ضعه هنا: -->
+    <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" /> -->
+
+    <!-- إذا كان ملف قوقل يقصد به Google Analytics، ضع كود Analytics هنا: -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'YOUR_GA_MEASUREMENT_ID');
+    </script>
+    -->
+
+    <!-- تصميم CSS بسيط (يمكنك وضع هذا في ملف style.css وربطه) -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222; /* لون خلفية داكن */
+            color: #eee; /* لون نص فاتح */
+            line-height: 1.6;
+            direction: rtl; /* لضمان دعم اللغة العربية بشكل جيد */
+            text-align: right; /* محاذاة النص لليمين للعربية */
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* للسماح للعناصر بالنزول لسطر جديد على الشاشات الصغيرة */
+        }
+        header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.8em;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+        }
+        nav ul li a {
+            color: #bbb;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #007bff;
+        }
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 0; /* لضمان عدم وجود مسافة علوية غير ضرورية */
+        }
+        .action-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+        #installAppButton {
+            display: none; /* يتم إظهاره بواسطة JavaScript عند توفر إمكانية التثبيت */
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        .visitor-counter {
+            background-color: #444;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        .guestbook-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .guestbook-form input[type="text"],
+        .guestbook-form textarea {
+            width: calc(100% - 20px); /* 100% عرض مع خصم البادينج */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #444;
+            color: #eee;
+        }
+        .guestbook-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .guestbook-form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .guestbook-form button:hover {
+            background-color: #218838;
+        }
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .messages-list li {
+            background-color: #444;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+        }
+        .messages-list li strong {
+            color: #007bff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-around;
+                margin-top: 10px;
+            }
+        }
+    </style>
 </head>
-<body class="text-slate-200">
-  <!-- خلفية الليل -->
-  <div class="night-sky"></div>
-  
-  <!-- النجوم -->
-  <div class="stars" id="stars"></div>
-  
-  <!-- الجبال -->
-  <div class="mountains">
-    <div class="mountain mountain-1"></div>
-    <div class="mountain mountain-2"></div>
-    <div class="mountain mountain-3"></div>
-    <div class="mountain mountain-4"></div>
-  </div>
-  
-  <!-- الغيوم -->
-  <div class="clouds" id="clouds"></div>
-  
-  <!-- المطر -->
-  <div class="rain-container" id="rain"></div>
-  
-  <!-- البرق -->
-  <div class="lightning" id="lightning"></div>
+<body>
 
-  <!-- الهيدر -->
-  <header class="fixed top-0 left-0 right-0 z-50 p-4">
-    <div class="max-w-6xl mx-auto">
-      <div class="glass-card rounded-2xl px-4 py-3 flex items-center justify-between">
-        <a href="#home" class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7c8db0] to-[#5a6a8a] flex items-center justify-center text-white font-bold text-lg">م</div>
-          <div>
-            <div class="font-bold text-white">ملاذك الآمن</div>
-            <div class="text-xs text-slate-400">Safe Haven</div>
-          </div>
-        </a>
-        
-        <nav class="hidden md:flex items-center gap-2">
-          <a href="#quotes" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">✨ اقتباسات</a>
-          <a href="#chat" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">💬 فضفضة</a>
-          <a href="#exercises" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">🧘 تمارين</a>
-          <a href="#games" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">🎮 ألعاب</a>
-          <a href="#contact" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">📬 تواصل</a>
+    <header>
+        <h1>موقعي الشخصي</h1>
+        <nav>
+            <ul>
+                <li><a href="/safe-haven.com/">الرئيسية</a></li>
+                <li><a href="/safe-haven.com/about.html">عنا</a></li> <!-- مثال لصفحة أخرى -->
+                <li><a href="/safe-haven.com/services.html">الخدمات</a></li> <!-- مثال لصفحة أخرى -->
+                <li><a href="/safe-haven.com/contact.html">تواصل معنا</a></li> <!-- مثال لصفحة أخرى -->
+            </ul>
         </nav>
-
-        <div class="flex items-center gap-2">
-          <button id="langBtn" class="soft-btn px-3 py-2 rounded-xl text-sm font-medium">EN</button>
-          <button id="menuBtn" class="md:hidden soft-btn w-10 h-10 rounded-xl flex items-center justify-center">☰</button>
+        <div class="header-actions">
+            <button id="installAppButton" class="action-button">تثبيت التطبيق</button>
+            <button id="languageToggleButton" class="action-button">English</button>
         </div>
-      </div>
+    </header>
+
+    <div class="container">
+        <h2>أهلاً بك في موقعنا!</h2>
+        <p>هذا مثال بسيط لتطبيق ويب تقدمي (PWA) مع بعض الميزات الإضافية التي طلبتها.</p>
+
+        <!-- عداد الزوار -->
+        <div class="visitor-counter">
+            <p>عدد الزوار (لك شخصيًا): <span id="visitorCount">0</span></p>
+        </div>
+
+        <!-- قسم رسائل الزوار (كتاب الضيوف) -->
+        <h2>رسائل الزوار</h2>
+        <form id="guestbookForm" class="guestbook-form">
+            <label for="visitorName">اسمك:</label>
+            <input type="text" id="visitorName" required>
+
+            <label for="visitorMessage">رسالتك:</label>
+            <textarea id="visitorMessage" required></textarea>
+
+            <button type="submit">إرسال الرسالة</button>
+        </form>
+
+        <ul id="messagesList" class="messages-list">
+            <!-- الرسائل ستظهر هنا بواسطة JavaScript -->
+        </ul>
     </div>
-  </header>
 
-  <!-- قائمة الجوال -->
-  <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 bottom-0 w-64 glass-card z-50 p-6">
-    <button id="closeMenu" class="absolute top-4 left-4 text-2xl text-slate-300">✕</button>
-    <div class="mt-12 flex flex-col gap-4">
-      <a href="#quotes" class="soft-btn px-4 py-3 rounded-xl text-center font-medium">✨ اقتباسات</a>
-      <a href="#chat" class="soft-btn px-4 py-3 rounded-xl text-center font-medium">💬 فضفضة</a>
-      <a href="#exercises" class="soft-btn px-4 py-3 rounded-xl text-center font-medium">🧘 تمارين</a>
-      <a href="#games" class="soft-btn px-4 py-3 rounded-xl text-center font-medium">🎮 ألعاب</a>
-      <a href="#contact" class="soft-btn px-4 py-3 rounded-xl text-center font-medium">📬 تواصل</a>
-      <button onclick="showAdminSection()" class="soft-btn px-4 py-3 rounded-xl text-center font-medium w-full">🔒 الرسائل</button>
-      <button id="muteBtn" class="soft-btn px-4 py-3 rounded-xl text-center font-medium w-full">🔊 الصوت</button>
-    </div>
-  </div>
-
-  <!-- المحتوى الرئيسي -->
-  <main class="relative z-10 pt-24 pb-12 px-4">
-    <div class="max-w-6xl mx-auto">
-      
-      <!-- الترحيب -->
-      <section id="home" class="text-center py-16 fade-in">
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-          ملاذك الآمن 🌙
-        </h1>
-        <p class="text-lg text-slate-300 mb-2">Safe Haven</p>
-        <p class="text-slate-400 max-w-xl mx-auto mb-8">
-          مكان هادي تقدر ترتاح فيه... تتنفس، تفضفض، وتلقى راحة نفسية 💙
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <a href="#chat" class="primary-btn px-6 py-3 rounded-2xl font-bold">ابدأ الفضفضة 💬</a>
-          <a href="#exercises" class="soft-btn px-6 py-3 rounded-2xl font-bold">تمارين الاسترخاء 🧘</a>
-        </div>
-      </section>
-
-      <!-- اقتباس اليوم -->
-      <section id="quotes" class="py-12 fade-in">
-        <div class="quote-card glass-card rounded-3xl p-8 text-center">
-          <div class="text-3xl mb-4">✨</div>
-          <h2 class="text-xl font-bold text-white mb-6">اقتباس اليوم | Daily Quote</h2>
-          
-          <div id="quoteAr" class="text-xl text-white font-medium mb-4 leading-relaxed"></div>
-          <div id="quoteEn" class="text-lg text-slate-300 italic mb-6"></div>
-          
-          <div class="flex justify-center gap-3 flex-wrap">
-            <button id="speakQuote" class="soft-btn px-4 py-2 rounded-xl text-sm flex items-center gap-2">
-              🔊 Listen
-            </button>
-            <button id="newQuote" class="soft-btn px-4 py-2 rounded-xl text-sm flex items-center gap-2">
-              🔄 اقتباس جديد
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- الفضفضة -->
-      <section id="chat" class="py-12 fade-in">
-        <div class="glass-card rounded-3xl p-6">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                💬 فضفضة آمنة
-              </h2>
-              <p class="text-sm text-slate-400">تكلم براحتك... أنا هنا أسمعك وأفهمك 💙</p>
-            </div>
-            <button id="clearChat" class="soft-btn px-3 py-2 rounded-xl text-sm">مسح المحادثة</button>
-          </div>
-
-          <div id="chatBox" class="chat-container rounded-2xl p-4 mb-4 bg-black/20">
-            <div class="text-center text-slate-400 py-12">
-              <div class="text-4xl mb-3">🌙</div>
-              <p>أهلاً فيك... كيف تحس اليوم؟</p>
-              <p class="text-sm mt-2">Hi there... How are you feeling today?</p>
-              <p class="text-xs text-slate-500 mt-4">أنا هنا أسمعك وأهتم بك... تفضفض براحتك</p>
-            </div>
-          </div>
-
-          <form id="chatForm" class="flex gap-3">
-            <input 
-              type="text" 
-              id="chatInput" 
-              class="flex-1 bg-black/30 border border-slate-600 rounded-2xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-[#7c8db0]"
-              placeholder="اكتب هنا... | Type here..."
-            >
-            <button type="submit" class="primary-btn px-6 py-3 rounded-2xl font-bold">إرسال</button>
-          </form>
-        </div>
-      </section>
-
-      <!-- التمارين - محسنة -->
-      <section id="exercises" class="py-12 fade-in">
-        <h2 class="text-2xl font-bold text-white text-center mb-8">🧘 تمارين الاسترخاء</h2>
-        
-        <!-- أزرار اختيار التمرين -->
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
-          <button class="exercise-tab active soft-btn px-4 py-2 rounded-xl" data-exercise="breathing-4-4-6">🌬️ تنفس 4-4-6</button>
-          <button class="exercise-tab soft-btn px-4 py-2 rounded-xl" data-exercise="breathing-4-7-8">🌙 تنفس للنوم 4-6-8</button>
-          <button class="exercise-tab soft-btn px-4 py-2 rounded-xl" data-exercise="sleep">😴 روتين النوم</button>
-          <button class="exercise-tab soft-btn px-4 py-2 rounded-xl" data-exercise="body-scan">🧍 المسح الجسمي</button>
-          <button class="exercise-tab soft-btn px-4 py-2 rounded-xl" data-exercise="muscle">💆 الاسترخاء العضلي</button>
-          <button class="exercise-tab soft-btn px-4 py-2 rounded-xl" data-exercise="imagine">✨ التخيل الموجه</button>
-        </div>
-
-        <!-- تمرين التنفس 4-4-6 -->
-        <div id="exercise-breathing-4-4-6" class="exercise-content">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🌬️ تمرين التنفس العميق (4-4-6)</h3>
-            <p class="text-slate-400 text-sm mb-6">تمرين ممتاز لتهدئة العقل والجسم بسرعة</p>
-            
-            <div class="flex justify-center mb-6 relative">
-              <div class="breath-ring w-32 h-32 absolute"></div>
-              <div class="breath-ring w-48 h-48 absolute" style="animation-delay: 0.5s"></div>
-              <div id="breathCircle1" class="breath-circle w-40 h-40 rounded-full bg-gradient-to-br from-[#7c8db0] to-[#5a6a8a] flex items-center justify-center shadow-lg shadow-[#7c8db0]/20 z-10">
-                <div class="text-center">
-                  <div id="breathText1" class="text-white font-bold text-lg">ابدأ</div>
-                  <div id="breathCount1" class="text-white/70 text-3xl font-bold mt-1">—</div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="progress-message" id="breathProgress1">اضغط "ابدأ" للبدء</div>
-            <div class="step-indicator">
-              <div class="step-dot" data-step="1"></div>
-              <div class="step-dot" data-step="2"></div>
-              <div class="step-dot" data-step="3"></div>
-            </div>
-            
-            <div class="flex justify-center gap-3 mt-6">
-              <button id="startBreath1" class="primary-btn px-5 py-2 rounded-xl font-bold">▶️ ابدأ</button>
-              <button id="stopBreath1" class="soft-btn px-5 py-2 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- تمرين التنفس 4-7-8 -->
-        <div id="exercise-breathing-4-7-8" class="exercise-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🌙 تمرين التنفس للنوم (4-6-8)</h3>
-            <p class="text-slate-400 text-sm mb-6">تنفس بطيء يساعد على تهدئة الدماغ والاستعداد للنوم</p>
-            <p class="text-slate-500 text-xs mb-4">شهيق 4 ثواني • حبس 6 ثواني • زفير 8 ثواني</p>
-            
-            <div class="flex justify-center mb-6 relative">
-              <div class="breath-ring w-32 h-32 absolute" style="border-color: rgba(156, 180, 204, 0.5)"></div>
-              <div class="breath-ring w-48 h-48 absolute" style="border-color: rgba(156, 180, 204, 0.3)"></div>
-              <div id="breathCircle2" class="breath-circle w-40 h-40 rounded-full bg-gradient-to-br from-[#9cb4cc] to-[#7c8db0] flex items-center justify-center shadow-lg shadow-[#9cb4cc]/20 z-10">
-                <div class="text-center">
-                  <div id="breathText2" class="text-white font-bold text-lg">ابدأ</div>
-                  <div id="breathCount2" class="text-white/70 text-3xl font-bold mt-1">—</div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="progress-message" id="breathProgress2">اضغط "ابدأ" للبدء</div>
-            <div class="step-indicator">
-              <div class="step-dot" data-step="1"></div>
-              <div class="step-dot" data-step="2"></div>
-              <div class="step-dot" data-step="3"></div>
-            </div>
-            
-            <div class="flex justify-center gap-3 mt-6">
-              <button id="startBreath2" class="primary-btn px-5 py-2 rounded-xl font-bold">▶️ ابدأ</button>
-              <button id="stopBreath2" class="soft-btn px-5 py-2 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- روتين النوم -->
-        <div id="exercise-sleep" class="exercise-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">😴 روتين النوم الهادئ</h3>
-            <p class="text-slate-400 text-sm mb-6">خطوات بسيطة تساعد جسمك وعقلك على الاسترخاء قبل النوم</p>
-            
-            <div id="sleepSteps" class="space-y-3 mb-6">
-              <div class="sleep-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="1">
-                <span class="text-2xl">🕯️</span>
-                <span class="text-slate-300">خفف الإضاءة وخلي الجو هادئ حولك</span>
-              </div>
-              <div class="sleep-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="2">
-                <span class="text-2xl">📵</span>
-                <span class="text-slate-300">أبعد الجوال 10 دقائق وركز على تنفسك</span>
-              </div>
-              <div class="sleep-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="3">
-                <span class="text-2xl">🫖</span>
-                <span class="text-slate-300">اشرب شيء دافئ يساعدك على الهدوء</span>
-              </div>
-              <div class="sleep-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="4">
-                <span class="text-2xl">🧘</span>
-                <span class="text-slate-300">اجلس براحة وركز على استرخاء جسمك</span>
-              </div>
-              <div class="sleep-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="5">
-                <span class="text-2xl">🌙</span>
-                <span class="text-slate-300">قل لنفسك: أنا آمن، جسمي يستحق الراحة</span>
-              </div>
-            </div>
-            
-            <div class="progress-message" id="sleepProgress">اضغط "ابدأ" للبدء</div>
-            <div class="flex justify-center gap-3">
-              <button id="startSleep" class="primary-btn w-full py-3 rounded-xl font-bold">▶️ ابدأ الروتين</button>
-              <button id="stopSleep" class="soft-btn px-5 py-3 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- المسح الجسمي -->
-        <div id="exercise-body-scan" class="exercise-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🧍 تمرين المسح الجسمي</h3>
-            <p class="text-slate-400 text-sm mb-6">استرخِ كل جزء من جسمك ببطء من الأعلى للأسفل</p>
-            
-            <div id="bodyScanSteps" class="space-y-3 mb-6">
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="1">
-                <span class="text-2xl">🧠</span>
-                <span class="text-slate-300">ركز على جبينك... اترك أي توتر هناك</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="2">
-                <span class="text-2xl">👀</span>
-                <span class="text-slate-300">استرخِ عينيك وفكك... دعهم يرتاحون</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="3">
-                <span class="text-2xl">👄</span>
-                <span class="text-slate-300">افكّ أسنانك... استرخِ لسانك وشفتيك</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="4">
-                <span class="text-2xl">👂</span>
-                <span class="text-slate-300">استرخِ كتفيك... دعهم يهبطون للأسفل</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="5">
-                <span class="text-2xl">🫁</span>
-                <span class="text-slate-300">تنفس بعمق... املأ صدرك بالهواء</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="6">
-                <span class="text-2xl">🖐️</span>
-                <span class="text-slate-300">استرخِ يديك... دع أصابعك ترتاح</span>
-              </div>
-              <div class="body-scan-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="7">
-                <span class="text-2xl">🦶</span>
-                <span class="text-slate-300">استرخِ ساقيك وقدميك... أطلق كل التوتر</span>
-              </div>
-            </div>
-            
-            <div class="progress-message" id="bodyScanProgress">اضغط "ابدأ" للبدء</div>
-            <div class="flex justify-center gap-3">
-              <button id="startBodyScan" class="primary-btn w-full py-3 rounded-xl font-bold">▶️ ابدأ التمرين</button>
-              <button id="stopBodyScan" class="soft-btn px-5 py-3 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- الاسترخاء العضلي -->
-        <div id="exercise-muscle" class="exercise-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">💆 الاسترخاء العضلي التدريجي</h3>
-            <p class="text-slate-400 text-sm mb-6">شد العضلات ثم ارخيها... ابدأ من القدمين للرأس</p>
-            
-            <div id="muscleSteps" class="space-y-3 mb-6">
-              <div class="muscle-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="1">
-                <span class="text-2xl">🦶</span>
-                <span class="text-slate-300">شد عضلات القدمين بقوة 5 ثواني ثم ارخيها</span>
-              </div>
-              <div class="muscle-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="2">
-                <span class="text-2xl">🦵</span>
-                <span class="text-slate-300">شد عضلات الساقين 5 ثواني ثم ارخيها</span>
-              </div>
-              <div class="muscle-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="3">
-                <span class="text-2xl">🤲</span>
-                <span class="text-slate-300">شد عضلات اليدين 5 ثواني ثم ارخيها</span>
-              </div>
-              <div class="muscle-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="4">
-                <span class="text-2xl">🙆</span>
-                <span class="text-slate-300">شد عضلات الكتفين 5 ثواني ثم ارخيها</span>
-              </div>
-              <div class="muscle-step flex items-center gap-3 p-3 rounded-xl bg-black/20" data-step="5">
-                <span class="text-2xl">😤</span>
-                <span class="text-slate-300">شد عضلات وجهك 5 ثواني ثم ارخيها</span>
-              </div>
-            </div>
-            
-            <div class="progress-message" id="muscleProgress">اضغط "ابدأ" للبدء</div>
-            <div class="flex justify-center gap-3">
-              <button id="startMuscle" class="primary-btn w-full py-3 rounded-xl font-bold">▶️ ابدأ التمرين</button>
-              <button id="stopMuscle" class="soft-btn px-5 py-3 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- التخيل الموجه -->
-        <div id="exercise-imagine" class="exercise-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">✨ التخيل الموجه</h3>
-            <p class="text-slate-400 text-sm mb-6">اختر مكاناً هادئاً وتخيل نفسك فيه بكل التفاصيل</p>
-            
-            <div id="imagineScenes" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div class="scene-card p-4 rounded-xl bg-black/20 text-center cursor-pointer hover:bg-black/30" data-scene="beach">
-                <div class="text-3xl mb-2">🏖️</div>
-                <div class="text-sm text-slate-300">شاطئ هادئ</div>
-              </div>
-              <div class="scene-card p-4 rounded-xl bg-black/20 text-center cursor-pointer hover:bg-black/30" data-scene="forest">
-                <div class="text-3xl mb-2">🌲</div>
-                <div class="text-sm text-slate-300">غابة خضراء</div>
-              </div>
-              <div class="scene-card p-4 rounded-xl bg-black/20 text-center cursor-pointer hover:bg-black/30" data-scene="mountain">
-                <div class="text-3xl mb-2">🏔️</div>
-                <div class="text-sm text-slate-300">قمة جبل</div>
-              </div>
-              <div class="scene-card p-4 rounded-xl bg-black/20 text-center cursor-pointer hover:bg-black/30" data-scene="night">
-                <div class="text-3xl mb-2">🌙</div>
-                <div class="text-sm text-slate-300">سماء نجوم</div>
-              </div>
-            </div>
-            
-            <div id="imagineContent" class="p-4 rounded-xl bg-black/30 mb-4 min-h-[100px]">
-              <p class="text-slate-400 text-center">اختر مشهداً للبدء...</p>
-            </div>
-            
-            <div class="progress-message" id="imagineProgress"></div>
-            <div class="flex justify-center gap-3">
-              <button id="startImagine" class="primary-btn px-5 py-3 rounded-xl font-bold">▶️ ابدأ</button>
-              <button id="stopImagine" class="soft-btn px-5 py-3 rounded-xl font-bold">⏹️ توقف</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- الألعاب -->
-      <section id="games" class="py-12 fade-in">
-        <h2 class="text-2xl font-bold text-white text-center mb-8">🎮 ألعاب مسلية للاسترخاء</h2>
-        
-        <!-- أزرار اختيار اللعبة -->
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
-          <button class="game-tab active soft-btn px-4 py-2 rounded-xl" data-game="memory">🧠 الذاكرة</button>
-          <button class="game-tab soft-btn px-4 py-2 rounded-xl" data-game="draw">🎨 الرسم</button>
-          <button class="game-tab soft-btn px-4 py-2 rounded-xl" data-game="numbers">🔢 ترتيب الأرقام</button>
-          <button class="game-tab soft-btn px-4 py-2 rounded-xl" data-game="words">💬 كلمات إيجابية</button>
-          <button class="game-tab soft-btn px-4 py-2 rounded-xl" data-game="colors">🎨 الألوان المهدئة</button>
-          <button class="game-tab soft-btn px-4 py-2 rounded-xl" data-game="relax">🌸 الراحة</button>
-        </div>
-
-        <!-- لعبة الذاكرة -->
-        <div id="game-memory" class="game-content">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🧠 لعبة الذاكرة</h3>
-            <p class="text-slate-400 text-sm mb-4">اقلب البطاقات وطابق الأزواج</p>
-            
-            <div id="memoryGame" class="flex flex-wrap justify-center gap-2 mb-4"></div>
-            
-            <div class="flex justify-between items-center">
-              <span class="text-slate-300">المحاولات: <span id="memoryMoves">0</span></span>
-              <button id="resetMemory" class="soft-btn px-4 py-2 rounded-xl text-sm">🔄 إعادة</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- لعبة الرسم -->
-        <div id="game-draw" class="game-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🎨 لوحة الرسم الحر</h3>
-            <p class="text-slate-400 text-sm mb-4">ارسم واستمتع... فرّغ مشاعرك بالألوان</p>
-            
-            <canvas id="drawCanvas" class="w-full h-48 rounded-xl bg-slate-800 cursor-crosshair mb-4"></canvas>
-            
-            <div class="flex items-center justify-between">
-              <div class="flex gap-2">
-                <button class="color-btn w-8 h-8 rounded-full bg-white border-2 border-slate-500" data-color="#ffffff"></button>
-                <button class="color-btn w-8 h-8 rounded-full bg-red-400 border-2 border-transparent" data-color="#f87171"></button>
-                <button class="color-btn w-8 h-8 rounded-full bg-yellow-400 border-2 border-transparent" data-color="#facc15"></button>
-                <button class="color-btn w-8 h-8 rounded-full bg-green-400 border-2 border-transparent" data-color="#4ade80"></button>
-                <button class="color-btn w-8 h-8 rounded-full bg-blue-400 border-2 border-transparent" data-color="#60a5fa"></button>
-                <button class="color-btn w-8 h-8 rounded-full bg-purple-400 border-2 border-transparent" data-color="#c084fc"></button>
-              </div>
-              <div class="flex gap-2">
-                <button id="clearCanvas" class="soft-btn px-4 py-2 rounded-xl text-sm">🗑️ مسح</button>
-                <button id="saveCanvas" class="primary-btn px-4 py-2 rounded-xl text-sm">💾 حفظ</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- لعبة الراحة -->
-        <div id="game-relax" class="game-content">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🌸 لعبة الراحة اليومية</h3>
-            <p class="text-slate-400 text-sm mb-4">تمرين مهدئ جديد كل يوم... خذ نفس عميق واتبع التعليمات</p>
-            
-            <div id="relaxContent" class="text-center py-6">
-              <div class="text-5xl mb-4" id="relaxEmoji">🌸</div>
-              <p class="text-xl text-white mb-4" id="relaxText">اضغط "ابدأ" للبدء</p>
-              <div id="relaxTimer" class="text-3xl text-[#9cb4cc] font-bold mb-4">--:--</div>
-            </div>
-            
-            <div class="flex justify-center gap-3 mt-4">
-              <button id="startRelax" class="primary-btn px-6 py-3 rounded-xl font-bold">🌸 ابدأ</button>
-              <button id="resetRelax" class="soft-btn px-6 py-3 rounded-xl font-bold">🔄 تمرين جديد</button>
-            </div>
-          </div>
-        </div>
-        <div id="game-bubbles" class="game-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🫧 فرقعة الفقاعات</h3>
-            <p class="text-slate-400 text-sm mb-4">اضغط على الفقاعات لفرقعتها... مريح للأعصاب!</p>
-            
-            <div id="bubbleGame" class="relative h-48 rounded-xl bg-black/20 overflow-hidden"></div>
-            
-            <div class="flex justify-between items-center mt-4">
-              <span class="text-slate-300">النقاط: <span id="bubbleScore">0</span></span>
-              <button id="startBubbles" class="primary-btn px-4 py-2 rounded-xl text-sm">🫧 ابدأ اللعب</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- لعبة ترتيب الأرقام -->
-        <div id="game-numbers" class="game-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🔢 ترتيب الأرقام</h3>
-            <p class="text-slate-400 text-sm mb-4">اضغط على الأرقام بالترتيب من 1 إلى 10</p>
-            
-            <div class="timer" id="numbersTimer">00:00</div>
-            
-            <div id="numbersGame" class="flex flex-wrap justify-center gap-3 mb-4"></div>
-            
-            <div class="flex justify-between items-center">
-              <span class="text-slate-300">الرقم التالي: <span id="nextNumber">1</span></span>
-              <button id="resetNumbers" class="soft-btn px-4 py-2 rounded-xl text-sm">🔄 إعادة</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- لعبة الكلمات الإيجابية -->
-        <div id="game-words" class="game-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">💬 كلمات إيجابية</h3>
-            <p class="text-slate-400 text-sm mb-4">اختر الكلمات الإيجابية لتعزيز مشاعرك</p>
-            
-            <div id="wordsGame" class="text-center mb-4"></div>
-            
-            <div class="text-center">
-              <p class="text-slate-400 mb-2">الكلمات المختارة: <span id="selectedWords">0</span>/10</p>
-              <div id="selectedWordsList" class="flex flex-wrap justify-center gap-2 min-h-[40px]"></div>
-            </div>
-            
-            <div class="flex justify-center mt-4">
-              <button id="resetWords" class="soft-btn px-4 py-2 rounded-xl text-sm">🔄 إعادة</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- لعبة الألوان المهدئة -->
-        <div id="game-colors" class="game-content hidden">
-          <div class="glass-card rounded-3xl p-6">
-            <h3 class="text-lg font-bold text-white mb-4">🎨 الألوان المهدئة</h3>
-            <p class="text-slate-400 text-sm mb-4">اضغط على الدوائر الملونة للاسترخاء ومشاهدة التأثيرات</p>
-            
-            <div id="colorCircles" class="flex flex-wrap justify-center gap-4 mb-4">
-              <div class="color-circle bg-blue-400" data-color="blue"></div>
-              <div class="color-circle bg-purple-400" data-color="purple"></div>
-              <div class="color-circle bg-green-400" data-color="green"></div>
-              <div class="color-circle bg-pink-400" data-color="pink"></div>
-              <div class="color-circle bg-yellow-400" data-color="yellow"></div>
-              <div class="color-circle bg-teal-400" data-color="teal"></div>
-            </div>
-            
-            <div id="colorMessage" class="text-center p-4 rounded-xl bg-black/30">
-              <p class="text-slate-400">اختر لوناً للبدء...</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- التواصل -->
-      <section id="contact" class="py-12 fade-in">
-        <div class="glass-card rounded-3xl p-6">
-          <h2 class="text-xl font-bold text-white text-center mb-6">📬 تواصل معنا</h2>
-          <p class="text-slate-400 text-center mb-6">شاركنا اقتراحاتك أو رسالتك... نحب نسمع منك!</p>
-          
-          <form id="contactForm" class="max-w-lg mx-auto space-y-4">
-            <input 
-              type="text" 
-              id="contactName" 
-              class="w-full bg-black/30 border border-slate-600 rounded-2xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-[#7c8db0]"
-              placeholder="اسمك (اختياري)"
-            >
-            <textarea 
-              id="contactMsg" 
-              rows="4"
-              class="w-full bg-black/30 border border-slate-600 rounded-2xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-[#7c8db0] resize-none"
-              placeholder="اكتب رسالتك أو اقتراحك هنا..."
-            ></textarea>
-            <button type="submit" class="primary-btn w-full py-3 rounded-2xl font-bold">📤 إرسال</button>
-          </form>
-          
-          <div id="contactSuccess" class="hidden text-center mt-4 p-4 rounded-2xl bg-green-500/20 text-green-300">
-            ✅ شكراً! تم استلام رسالتك بنجاح
-          </div>
-
-          <!-- انستقرام -->
-          <div class="text-center mt-8 pt-6 border-t border-slate-700">
-            <p class="text-slate-400 mb-3">أو تواصل معي مباشرة على انستقرام</p>
-            <a href="https://instagram.com/_itlulp" target="_blank" class="inline-flex items-center gap-2 soft-btn px-6 py-3 rounded-2xl font-bold">
-              <span class="text-xl">📸</span>
-              @_itlulp
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- صفحة الرسائل (للأدمن - محمية) -->
-      <section id="admin" class="py-12 fade-in" style="display: none;">
-        <div class="glass-card rounded-3xl p-6">
-          <!-- نموذج تسجيل الدخول -->
-          <div id="adminLogin" class="max-w-md mx-auto">
-            <h2 class="text-xl font-bold text-white text-center mb-6">🔒 تسجيل دخول</h2>
-            <form id="adminLoginForm" class="space-y-4">
-              <input 
-                type="password" 
-                id="adminPassword" 
-                class="w-full bg-black/30 border border-slate-600 rounded-2xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-[#7c8db0]"
-                placeholder="كلمة المرور"
-                required
-              >
-              <button type="submit" class="primary-btn w-full py-3 rounded-2xl font-bold">🔓 دخول</button>
-            </form>
-          </div>
-
-          <!-- لوحة الرسائل (مخفية حتى تسجيل الدخول) -->
-          <div id="adminPanel" style="display: none;">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-white">📥 صندوق الرسائل</h2>
-              <div class="flex gap-2">
-                <button id="clearMessages" class="soft-btn px-3 py-2 rounded-xl text-sm">🗑️ مسح الكل</button>
-                <button id="adminLogout" class="soft-btn px-3 py-2 rounded-xl text-sm">🚪 خروج</button>
-              </div>
-            </div>
-            
-            <div id="messagesList" class="space-y-4 max-h-96 overflow-y-auto">
-              <div class="text-center text-slate-400 py-8">
-                <div class="text-4xl mb-3">📭</div>
-                <p>لا توجد رسائل بعد</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-  </main>
-
-  <!-- الفوتر -->
-  <footer class="relative z-10 text-center py-8 border-t border-slate-700/50">
-    <p class="text-slate-400">صُنع بـ 💙 لراحتك النفسية</p>
-    <p class="text-slate-500 text-sm mt-2">Made with love for your peace of mind</p>
-    <a href="https://instagram.com/_itlulp" target="_blank" class="inline-block mt-4 text-slate-400 hover:text-white transition-colors">
-      📸 @_itlulp
-    </a>
-    <div class="mt-4">
-      <button onclick="showAdminSection()" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-sm bg-transparent border-none cursor-pointer">
-        🔒 الرسائل
-      </button>
-    </div>
-  </footer>
-
-  <script>
-    // ========== الإعدادات ==========
-    const QUOTES = [
-      { ar: "كل شي بيعدي... بس خلك قوي 💙", en: "Everything will pass... just stay strong" },
-      { ar: "أنت أقوى مما تتخيل ✨", en: "You are stronger than you think" },
-      { ar: "الراحة النفسية تبدأ من الداخل 🌙", en: "Inner peace starts from within" },
-      { ar: "خذ نفس عميق... كل شي بيكون تمام 🌸", en: "Take a deep breath... everything will be okay" },
-      { ar: "مشاعرك صحيحة ومهمة 💜", en: "Your feelings are valid and important" },
-      { ar: "اليوم صعب، بس بكرة أحلى 🌅", en: "Today is hard, but tomorrow will be better" },
-      { ar: "لا تقسى على نفسك... أنت تسوي أفضل شي تقدر عليه 🤍", en: "Don't be hard on yourself... you're doing your best" },
-      { ar: "الحياة مليانة فرص جديدة 🌻", en: "Life is full of new opportunities" },
-      { ar: "استرح... ما أحد يطاردك 🌿", en: "Rest... no one is chasing you" },
-      { ar: "كل يوم جديد هو بداية جديدة 🌈", en: "Every new day is a fresh start" },
-      { ar: "أنت تستاهل الحب والسعادة 💕", en: "You deserve love and happiness" },
-      { ar: "خطوة وحدة صغيرة تكفي اليوم 👣", en: "One small step is enough for today" },
-      { ar: "مو لازم تكون مثالي... كن أنت 🦋", en: "You don't have to be perfect... just be you" },
-      { ar: "الألم مؤقت والفرح قادم ☀️", en: "Pain is temporary and joy is coming" },
-      { ar: "ترى حتى القمر له أوقات يختفي فيها 🌑", en: "Even the moon has times when it disappears" },
-      { ar: "أنت لست وحدك... نحبك 💗", en: "You are not alone... you are loved" },
-      { ar: "لاحظ التقدم الكامل... حتى خطوة صغيرة مهمة 📈", en: "Notice the complete progress... even a small step matters" },
-      { ar: "امنح نفسك نفس الوقت والرحمة التي تمنحها للآخرين 🤗", en: "Give yourself the same time and compassion you give to others" },
-      { ar: "الطقس السيء لا يستمر للأبد، مثل المشاعر الصعبة ☁️", en: "Bad weather doesn't last forever, just like difficult feelings" },
-      { ar: "وجودك يفرق، حتى لو لا تراه الآن 🌟", en: "Your presence makes a difference, even if you don't see it now" },
-      { ar: "كن لطيفاً مع عقلك وقلبك 🧠❤️", en: "Be kind to your mind and heart" },
-      { ar: "أنت تستحق الراحة والسلام 🕊️", en: "You deserve rest and peace" },
-      { ar: "الشفاء ليس خطياً، وبعض الأيام أسهل من غيرها 📊", en: "Healing is not linear, and some days are easier than others" },
-      { ar: "لا تحتاج لإصلاح كل شيء اليوم 🛠️", en: "You don't need to fix everything today" },
-      { ar: "الصمود يتطلب شجاعة، وأنت شجاع 💪", en: "Resilience takes courage, and you are courageous" },
-      { ar: "أنت تستحق الحب غير المشروط 💗", en: "You deserve unconditional love" },
-      { ar: "الهدنة مع النفس بداية الشفاء 🌱", en: "Truce with oneself is the beginning of healing" },
-      { ar: "لست أخطاءك... أنت تقدمك 🌈", en: "You are not your mistakes... you are your progress" }
-    ];
-
-    const AI_RESPONSES = {
-      sad: [
-        { 
-          ar: "أحس فيك والله... الحزن شعور ثقيل على القلب، وأعرف إنه أحياناً يحسسنا بالوحدة في هالدنيا الكبيرة 💙\n\nبس خليني أقلك شي مهم جداً: وجودك هنا الحين، ومشاركتك لمشاعرك معي، هذا دليل على قوتك وشجاعتك. ناس كثير ما يقدرون يعترفون بمشاعرهم، لكنك قدرت.\n\nخليني أسألك:\n\n🌟 ليش تحس بالحزن اليوم؟ صار شي معين أثّر عليك؟\nمن متى وهالشعور معك؟ من متى وأحس بحالك كذا؟\nفي شي كنت تسويه قبل ويخليك تحس أحسن؟ نشاط أو شخص أو حتى مكان؟\n\n💡 حلول عملية تقدر تبدأ بها الحين:\n\n1. خذ نفس عميق... شهيق 4 ثواني، حبس 4 ثواني، زفير 6 ثواني - كرره 3 مرات\n2. اكتب كل اللي تحس فيه في ورقة أو مفكرة - فرّغ كل شي بدون تفكير\n3. اتصل أو ارسل رسالة لشخص تثق فيه - الكلام والشركة تخفف\n4. امشِ بره 10 دقائق - الهواء والحركة يغيرون كيمياء المخ\n5. شرب شي دافي - قهوة، شاي، أو حليب\n\n🌟 وتذكر:\nالحزن مو ضعف، هو جزء من كونك إنسان حقيقي بمشاعر عميقة. وهالشعور بيعدي... كل شي بيعدي. أنت أقوى مما تتخيل، وقدامك أيام أحلى كثير.\n\nكل مرة عديت فيها من موقف صعب في حياتك، هذا دليل على قوتك. أنت ناجح في تجاوز الصعاب قبل، وبتجاوزها إن شاء الله 🌈\n\nتحب تحكيلي أكثر عن اللي يحزنك؟ أنا هنا... معك خطوة بخطوة 🤍", 
-          en: "I truly feel you... sadness is heavy on the heart, and I know sometimes it makes us feel alone in this big world 💙\n\nBut let me tell you something very important: being here now and sharing your feelings with me is proof of your strength and courage. Many people can't admit their feelings, but you did.\n\nLet me ask you:\n\n🌟 Why do you feel sad today? Did something specific affect you?\nHow long have you been feeling this way? When did you start feeling like this?\nIs there something you used to do that made you feel better? An activity, a person, or even a place?\n\n💡 Practical solutions you can start right now:\n\n1. Take a deep breath... inhale 4 seconds, hold 4 seconds, exhale 6 seconds - repeat 3 times\n2. Write everything you feel in a notebook or journal - release everything without thinking\n3. Call or text someone you trust - talking and company help\n4. Walk outside for 10 minutes - fresh air and movement change brain chemistry\n5. Drink something warm - coffee, tea, or milk\n\n🌟 And remember:\nSadness is not weakness, it's part of being a real human with deep feelings. This feeling will pass... everything passes. You're stronger than you think, and you have much better days ahead.\n\nEvery time you've gone through a difficult situation in your life, this is proof of your strength. You've succeeded in overcoming difficulties before, and you will overcome them 🌈\n\nWant to tell me more about what's making you sad? I'm here... with you step by step 🤍" 
+    <!-- كود JavaScript -->
+    <script>
+        // 1. تسجيل Service Worker (لجعل الموقع PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // يجب أن يشمل مسار Service Worker اسم الريبو
+                navigator.serviceWorker.register('/safe-haven.com/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
         }
-      ],
-      depressed: [
-        { 
-          ar: "أشوفك تمر بوقت ثقيل جداً... الاكتئاب شعور قاسي ويخلي الإنسان يحس إنه مافي أمل 💙\n\nخليني أقلك شي مهم جداً: اللي تحس فيه الحين مو حقيقة، هو مرض. والمرض يتعالج ويعدي. أنت مو ضعيف، أنت مريض، وهذا فرق كبير.\n\n🌟 أول شي لازم تعرفه:\n\nالاكتئاب يكذب عليك - يقلك \"ما في فايدة\" و \"أنت مو مهم\" و \"ما أحد يهتم\" - كل هذي كذب\nوجودك هنا الحين دليل على قوة جواك ما تموت - ما زال فيك أمل\nفي ناس كثير عدوا من نفس المكان وطلعوا للنور - ممكن تكبر وتعرف قصصهم؟\n\n💡 خطوات صغيرة بس مهمة:\n\n1. قوم من السرير - حتى لو صعب، هذا إنجاز كبير\n2. افتح الشباك - ضوء الشمس يغير كيمياء المخ ويرفع المزاج\n3. استحم - الماي الدافي يريح الجسم والعقل\n4. اتصل بشخص واحد تثق فيه - ما تحتاج تشرح كل شي، بس قل \"أحتاج أسمع صوتك\"\n5. كل شي بسيط - حتى لو تفاحة أو شطيرة\n6. نام مبكر - النوم مهم جداً للصحة النفسية\n\n🌟 الحقيقة اللي لازم تسمعها:\n\nأنت مهم. وجودك في الحياة له معنى وقيمة. في ناس يحبونك حتى لو ما تحس فيهم الحين. وفي أيام جميلة قدامك ما تتخيلها.\n\nالاكتئاب زي سحابة سوداء تغطي الشمس، بس الشمس موجودة ورا السحاب، وبترجع تطلع 🌅\n\nأنت قوي، وقدرتك على التغلب أكبر من كل فكرة سلبية في راسك. قدامك فرص للشفاء والسعادة.\n\nليش ما تحكيلي أكثر عن اللي تحس فيه؟ متى بدأ؟ صار شي معين؟ أنا معك... ومش بسيبك 💜", 
-          en: "I see you're going through a very heavy time... depression is harsh and makes a person feel there's no hope 💙\n\nLet me tell you something very important: what you're feeling now isn't reality, it's an illness. And illness can be treated and passes. You're not weak, you're sick, and that's a big difference.\n\n🌟 First thing you need to know:\n\nDepression lies to you - it says \"there's no point\" and \"you're not important\" and \"no one cares\" - all these are lies\nBeing here now is proof of a strength inside you that doesn't die - there's still hope in you\nMany people have been through the same place and came out to the light - want to hear their stories?\n\n💡 Small but important steps:\n\n1. Get out of bed - even if it's hard, that's a big achievement\n2. Open the window - sunlight changes brain chemistry and improves mood\n3. Take a shower - warm water soothes body and mind\n4. Call one person you trust - you don't need to explain everything, just say \"I need to hear your voice\"\n5. Eat something simple - even an apple or a sandwich\n6. Sleep early - sleep is very important for mental health\n\n🌟 The truth you need to hear:\n\nYou matter. Your presence in life has meaning and value. There are people who love you even if you don't feel it now. And there are beautiful days ahead you can't imagine.\n\nDepression is like a dark cloud covering the sun, but the sun exists behind the clouds, and it will shine again 🌅\n\nYou are strong, and your ability to overcome is greater than any negative thought in your head. You have opportunities for healing and happiness ahead.\n\nWhy don't you tell me more about what you're feeling? When did it start? Did something specific happen? I'm with you... and I won't leave you 💜" 
+
+        // 2. زر تثبيت التطبيق (PWA Install Prompt)
+        let deferredPrompt;
+        const installAppButton = document.getElementById('installAppButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // منع ظهور الشعار التلقائي للمتصفح
+            e.preventDefault();
+            // تخزين الحدث بحيث يمكن تشغيله لاحقًا
+            deferredPrompt = e;
+            // إظهار زر التثبيت الخاص بنا
+            installAppButton.style.display = 'block';
+            console.log('beforeinstallprompt fired');
+        });
+
+        installAppButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // إخفاء الزر بعد الضغط عليه
+                installAppButton.style.display = 'none';
+                // عرض تنبيه التثبيت للمستخدم
+                deferredPrompt.prompt();
+                // انتظار رد المستخدم
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to install prompt: ${outcome}`);
+                // إعادة تعيين deferredPrompt لأن الحدث يمكن استخدامه مرة واحدة فقط
+                deferredPrompt = null;
+            }
+        });
+
+        // 3. زر تغيير اللغة
+        const languageToggleButton = document.getElementById('languageToggleButton');
+        const htmlElement = document.documentElement; // عنصر <html>
+
+        // حفظ اللغة المفضلة للمستخدم في التخزين المحلي
+        let currentLang = localStorage.getItem('appLang') || 'ar'; // الافتراضي عربي
+
+        // وظيفة لتحديث نصوص الصفحة بناءً على اللغة
+        function updateContentForLanguage(lang) {
+            if (lang === 'en') {
+                document.title = 'My Safe Site - PWA';
+                document.querySelector('header h1').textContent = 'My Personal Website';
+                document.querySelector('nav ul li:nth-child(1) a').textContent = 'Home';
+                document.querySelector('nav ul li:nth-child(2) a').textContent = 'About Us';
+                document.querySelector('nav ul li:nth-child(3) a').textContent = 'Services';
+                document.querySelector('nav ul li:nth-child(4) a').textContent = 'Contact Us';
+                document.querySelector('.container h2:nth-of-type(1)').textContent = 'Welcome to Our Website!';
+                document.querySelector('.container p').textContent = 'This is a simple example of a Progressive Web App (PWA) with some extra features you requested.';
+                document.querySelector('.visitor-counter p').innerHTML = 'Visitor Count (for you): <span id="visitorCount">' + (localStorage.getItem('page_visits') || 0) + '</span>';
+                document.querySelector('.container h2:nth-of-type(2)').textContent = 'Guest Messages';
+                document.querySelector('#guestbookForm label[for="visitorName"]').textContent = 'Your Name:';
+                document.querySelector('#guestbookForm label[for="visitorMessage"]').textContent = 'Your Message:';
+                document.querySelector('#guestbookForm button[type="submit"]').textContent = 'Send Message';
+                languageToggleButton.textContent = 'العربية';
+            } else { // 'ar'
+                document.title = 'موقعي الآمن - PWA';
+                document.querySelector('header h1').textContent = 'موقعي الشخصي';
+                document.querySelector('nav ul li:nth-child(1) a').textContent = 'الرئيسية';
+                document.querySelector('nav ul li:nth-child(2) a').textContent = 'عنا';
+                document.querySelector('nav ul li:nth-child(3) a').textContent = 'الخدمات';
+                document.querySelector('nav ul li:nth-child(4) a').textContent = 'تواصل معنا';
+                document.querySelector('.container h2:nth-of-type(1)').textContent = 'أهلاً بك في موقعنا!';
+                document.querySelector('.container p').textContent = 'هذا مثال بسيط لتطبيق ويب تقدمي (PWA) مع بعض الميزات الإضافية التي طلبتها.';
+                document.querySelector('.visitor-counter p').innerHTML = 'عدد الزوار (لك شخصيًا): <span id="visitorCount">' + (localStorage.getItem('page_visits') || 0) + '</span>';
+                document.querySelector('.container h2:nth-of-type(2)').textContent = 'رسائل الزوار';
+                document.querySelector('#guestbookForm label[for="visitorName"]').textContent = 'اسمك:';
+                document.querySelector('#guestbookForm label[for="visitorMessage"]').textContent = 'رسالتك:';
+                document.querySelector('#guestbookForm button[type="submit"]').textContent = 'إرسال الرسالة';
+                languageToggleButton.textContent = 'English';
+            }
+            htmlElement.setAttribute('lang', lang);
+            htmlElement.style.direction = (lang === 'en' ? 'ltr' : 'rtl');
+            document.body.style.textAlign = (lang === 'en' ? 'left' : 'right');
+            localStorage.setItem('appLang', lang); // حفظ اللغة
         }
-      ],
-      anxious: [
-        { 
-          ar: "القلق شعور صعب جداً... أحس إنه يخلي العقل يفكر بألف سيناريو سيء، صح؟ 💙\n\nأول شي... خذ نفس عميق الحين معي. شهيق 4 ثواني... حبس 4 ثواني... زفير 6 ثواني. كرره مرتين. أحسن؟\n\nخليني أسألك عشان أفهم أكثر:\n\n🌬️ شو اللي يقلقك بالضبط؟ موقف معين؟ المستقبل؟ صحتك؟ أهلك؟ شغلك؟\nمتى يزيد القلق؟ في وقت معين من اليوم؟ ليل؟ صباح؟ قبل النوم؟\nجربت أي شي قبل ساعدك يخف القلق؟ تمرين تنفس؟ مشي؟ كلام مع شخص؟\n\n💡 تقنيات فورية توقف دوامة القلق:\n\n1. تقنية 5-4-3-2-1: سمِّ 5 أشياء تشوفها، 4 تحسها، 3 تسمعها، 2 تشمها، 1 تتذوقه - هذا يرجعك للحظة الحالية\n2. اكتب أسوأ سيناريو... ثم اكتب: \"لو صار، كيف بتعامل معه؟\" - القلق يصغر لما نواجهه\n3. ميّز بين: \"شو أقدر أتحكم فيه\" و \"شو خارج سيطرتي\" - ركز على اللي تقدر تغيره بس\n4. تحرك جسمك - قفز، امشِ بسرعة، تمدد - الحركة تكسر دورة القلق\n5. اسمع صوت هادي - موسيقى، طبيعة، أو حتى صوت المطر مثل الحين\n\n🌟 الحقيقة اللي لازم تعرفها:\n\nأغلب الأشياء اللي نقلق منها ما تصير أبداً. الإحصائيات تقول إن 85% من الأشياء اللي نقلق عليها لا تحدث.\n\nالقلق هو خوف من المستقبل، بس المستقبل ما صار بعد. اللي عندك هو الحين، وفي هاللحظة... كل شي تمام.\n\nأنت قوي، وقادر تتعامل مع أي شي ييجي. كل مرة عديت فيها من موقف صعب قبل، هذا دليل على قوتك 💪\n\nتحب نفكك الموضوع اللي يقلقك خطوة بخطوة؟ أو تحتاج نتكلم عن شي معين؟ 🤝", 
-          en: "Anxiety is so difficult... I feel like it makes the mind think of a thousand bad scenarios, right? 💙\n\nFirst thing... take a deep breath with me now. Inhale 4 seconds... hold 4 seconds... exhale 6 seconds. Repeat twice. Better?\n\nLet me ask to understand better:\n\n🌬️ What exactly is worrying you? Specific situation? The future? Your health? Family? Work?\nWhen does anxiety increase? At a certain time of day? Night? Morning? Before sleep?\nHave you tried anything before that helped reduce anxiety? Breathing exercise? Walking? Talking to someone?\n\n💡 Immediate techniques to stop the anxiety spiral:\n\n1. 5-4-3-2-1 technique: Name 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste - this brings you to the present moment\n2. Write worst case scenario... then write: \"If it happens, how will I deal with it?\" - anxiety shrinks when we face it\n3. Distinguish between: \"What I can control\" and \"What's beyond my control\" - focus only on what you can change\n4. Move your body - jump, walk fast, stretch - movement breaks the anxiety cycle\n5. Listen to calm sounds - music, nature, or even rain sounds like right now\n\n🌟 Truth you need to know:\n\nMost things we worry about never happen. Statistics say 85% of the things we worry about do not occur.\n\nAnxiety is fear of the future, but the future hasn't happened yet. What you have is now, and in this moment... everything is okay.\n\nYou are strong and capable of handling anything that comes. Every time you've gotten through a difficult situation before is proof of your strength 💪\n\nWant to break down what's worrying you step by step? Or need to talk about something specific? 🤝" 
-        }
-      ],
-      lonely: [
-        { 
-          ar: "الوحدة شعور قاسي... يخليك تحس إنك منسي في هالدنيا الكبيرة 💜\n\nبس تعرف شي؟ أنت مو لوحدك. في ناس كثير يحسون بنفس الشعور، وفي ناس يحبونك حتى لو ما تشوفهم الحين. ووجودي هنا معك الحين دليل إنك مو لوحدك.\n\nخليني أفهم أكثر:\n\n🌙 متى تحس بالوحدة أكثر؟ الليل؟ نهاية الأسبوع؟ في المناسبات؟\nفي شخص كنت قريب منه وابتعدت عنه؟ صديق؟ قريب؟\nشو اللي تتمنى يكون موجود في حياتك الحين؟ صديق مقرب؟ شريك؟ عائلة؟\n\n💡 خطوات عملية تكسر الوحدة:\n\n1. تواصل مع شخص ولو برسالة واحدة - \"كيف حالك؟\" أو \"تذكرتك اليوم\" - هذا يفرق\n2. انضم لنشاط جماعي - رياضة، تطوع، نادي قراءة، ورش عمل - أحسن طريقة تلقى ناس مثلك\n3. روح مكان عام - مقهى، مكتبة، حديقة، نادي - حتى لو ما تكلمت أحد، الوجود حول الناس يخفف\n4. اتصل بشخص من أهلك أو صحابك القدام - حتى لو ما تكلمتوا فترة، غالبيتهم سيسعدون بسماعك\n5. سوي هواية جديدة - رسم، قراءة، كتابة، طبخ - الهوايات تفتح باب لقاءات جديدة\n\n🌟 شي مهم تعرفه:\n\nالوحدة مو نقص فيك. كونك تحس بالوحدة معناه عندك قلب يحتاج حب وتواصل، وهذا شي جميل مو عيب. الكل يحتاج ناس في حياته.\n\nوتذكر: الوحدة شعور مؤقت، مو وضع دائم. في ناس بتدخل حياتك وتملاها فرح، بس تحتاج تفتح قلبك وتخرج لهم.\n\nأنت إنسان يستاهل الحب والصحبة، ووجودك يضيف للعالم. ما تحتاج تكون مثالي عشان تستاهل ناس حواليك - بس كن نفسك الحقيقية 💙\n\nتحب تحكيلي عن يومك؟ أو عن شي تحبه وتتمنى تشاركه مع أحد؟ أنا هنا... أسمعك 🌸", 
-          en: "Loneliness is harsh... it makes you feel forgotten in this big world 💜\n\nBut you know what? You're not alone. Many people feel the same way, and there are people who love you even if you don't see them now. And my presence here with you now is proof you're not alone.\n\nLet me understand more:\n\n🌙 When do you feel loneliest? At night? Weekends? During occasions?\nIs there someone you were close to and distanced from? A friend? A relative?\nWhat do you wish existed in your life now? A close friend? A partner? Family?\n\n💡 Practical steps to break loneliness:\n\n1. Reach out to someone even with one message - \"How are you?\" or \"Thought of you today\" - this makes a difference\n2. Join a group activity - sports, volunteering, book club, workshops - best way to find people like you\n3. Go to a public place - cafe, library, park, club - even if you don't talk to anyone, being around people helps\n4. Call someone from your family or old friends - even if you haven't talked in a while, most of them will be happy to hear from you\n5. Start a new hobby - drawing, reading, writing, cooking - hobbies open doors to new meetings\n\n🌟 Important thing to know:\n\nLoneliness isn't a deficiency in you. Feeling lonely means you have a heart that needs love and connection, and that's beautiful not a flaw. Everyone needs people in their life.\n\nRemember: loneliness is a temporary feeling, not a permanent state. People will enter your life and fill it with joy, you just need to open your heart and go out to them.\n\nYou're a person who deserves love and companionship, and your existence adds to the world. You don't need to be perfect to deserve people around you - just be your true self 💙\n\nWant to tell me about your day? Or about something you love and wish to share with someone? I'm here... listening 🌸" 
-        }
-      ],
-      tired: [
-        { 
-          ar: "التعب النفسي أقسى من التعب الجسدي... يخليك تحس إنك ما عندك طاقة حتى للأشياء البسيطة 💙\n\nأول شي... مو عيب إنك تعبت. مو لازم تكون قوي طول الوقت. من حقك تتعب ومن حقك تاخذ استراحة.\n\nخليني أسألك:\n\n🌙 شو اللي متعبك أكثر شي؟ الشغل؟ الناس؟ الضغوط؟ المشاكل؟ الدراسة؟\nمتى آخر مرة أخذت استراحة حقيقية؟ استراحة تامة بدون جوال ولا مهام؟\nفي شي تسويه \"لازم\" بس ما يضيف لحياتك؟ نشاط أو التزام؟\n\n💡 خطوات فورية تريح عقلك وجسمك:\n\n1. قول \"لا\" - مو لازم توافق على كل شي، صحتك النفسية أهم من أي شيء\n2. نام مبكر الليلة - النوم يصلح اللي خربه التعب ويعيد النشاط\n3. امسح شي من قائمة مهامك - مو كل شي \"ضروري\" - بعض الأشياء تقدر تؤجل\n4. خذ 15 دقيقة بس لنفسك - بدون جوال، بدون مهام، بس أنت وعقلك\n5. افعل شي بسيط تحبه - شرب قهوة، استمع لأغنية، شوف حلقة مسلسل\n6. اطلب المساعدة - ما في عيب تطلب من حد يساعدك\n\n🌟 الحقيقة اللي تحتاج تسمعها:\n\nالعالم مش بينهار لو أخذت استراحة. الناس بيتفهمون لو قلت \"أحتاج وقت\". وصحتك النفسية أهم من أي إنجاز أو رضا الناس.\n\nأنت مو آلة. أنت إنسان يحتاج راحة، وهذا طبيعي وضروري. القوة الحقيقية مو في إنك تكمل لين ما تنهار، القوة في إنك تعرف متى توقف وتستريح.\n\nخفف على نفسك. قلل المهام. نام أكثر. قول \"لا\" أكثر. اهتم بنفسك مثل ما تهتم بالناس. أنت تستاهل الراحة والاهتمام.\n\nوبعد الراحة، بترجع أقوى. وعياتك بتكون أحسن لما تكون مرتاح نفسياً 🌸\n\nتحب نحكي عن اللي يتعبك بالضبط؟ أو كيف نخفف الحمل عليك؟ قلي... أنا هنا 💜", 
-          en: "Mental exhaustion is harsher than physical exhaustion... it makes you feel you have no energy even for simple things 💙\n\nFirst thing... it's not shameful that you're tired. You don't have to be strong all the time. You have the right to be tired and you have the right to take a break.\n\nLet me ask you:\n\n🌙 What's exhausting you the most? Work? People? Pressures? Problems? Studies?\nWhen was the last time you took a real break? A complete break without phone or tasks?\nIs there something you do \"must\" but doesn't add to your life? An activity or commitment?\n\n💡 Immediate steps to rest your mind and body:\n\n1. Say \"no\" - you don't have to agree to everything, your mental health is more important than anything\n2. Sleep early tonight - sleep fixes what exhaustion broke and restores energy\n3. Delete something from your to-do list - not everything is \"essential\" - some things can be postponed\n4. Take 15 minutes just for yourself - no phone, no tasks, just you and your mind\n5. Do something simple you love - drink coffee, listen to a song, watch an episode of a series\n6. Ask for help - there's no shame in asking someone to help you\n\n🌟 Truth you need to hear:\n\nThe world won't collapse if you take a break. People will understand if you say \"I need time\". And your mental health is more important than any achievement or people's approval.\n\nYou're not a machine. You're a human who needs rest, and that's natural and necessary. Real strength isn't in continuing until you collapse, strength is in knowing when to stop and rest.\n\nBe easier on yourself. Reduce tasks. Sleep more. Say \"no\" more. Take care of yourself like you take care of others. You deserve rest and care.\n\nAfter rest, you'll come back stronger. And your life will be better when you're mentally rested 🌸\n\nWant to talk about what's exhausting you exactly? Or how to lighten the load on you? Tell me... I'm here 💜" 
-        }
-      ],
-      crying: [
-        {
-          ar: "أحس إنك تحس إنك تبكي... والله البكا مو عيب 💙\n\nالبكا إفراز طبيعي للجسم لما يتجاوز الحد. هو طريقة جسمك يفرغ فيها التوتر والألم. مو ضعف، هو قوة.\n\nخليني أسألك:\n\n😢 ليش تبغى تبكي؟ صار شي أوجعك؟\nمن متى وأنت تكتم داخلك؟\nتحس إنك تحتاج تفرغ كل اللي في جواك؟\n\n💡 خليني أساعدك تفرغ:\n\n1. اسمح لنفسك تبكي - لا تكتم، أفرغ كل اللي فيك\n2. بعد ما تبكي، اشرب ماي بارد - هذا يرتاح الجسم\n3. خذ نفس عميق - شهيق 4، حبس 4، زفير 6\n4. اغسل وشك - الحمة بتخفف وتعيد النشاط\n5. اسمع شي هادي - موسيقى أو طبيعة\n\n🌟 تذكر:\n\nالبكا يفرغ القلب. بعد البكا، دايم نحس أخف.\n\nأنت قوي لأنك تعبر عن مشاعرك. هذا مو ضعف.\n\nتحس إنك تحكيلي عن اللي خلاك تبكي؟ أنا أسمعك 💜",
-          en: "I feel like you feel like crying... and crying is not shameful 💙\n\nCrying is a natural release of the body when it exceeds the limit. It's your body's way to release tension and pain. It's not weakness, it's strength.\n\nLet me ask you:\n\n😢 Why do you want to cry? Did something hurt you?\nHow long have you been holding it inside?\nDo you feel you need to release everything inside you?\n\n💡 Let me help you release:\n\n1. Allow yourself to cry - don't hold back, release everything inside\n2. After crying, drink cold water - this comforts the body\n3. Take a deep breath - inhale 4, hold 4, exhale 6\n4. Wash your face - washing helps and restores energy\n5. Listen to something calm - music or nature\n\n🌟 Remember:\n\nCrying empties the heart. After crying, we always feel lighter.\n\nYou are strong because you express your feelings. This is not weakness.\n\nDo you feel like telling me what made you cry? I'm listening 💜"
-        }
-      ],
-      want_to_cry: [
-        {
-          ar: "أحس فيك... تبي تبكي بس مو قادر 💙\n\nأحياناً البكا يكون محبوس ومو طالع، وهذا مؤلم.\n\nخليني أساعدك:\n\n💡 أشياء تساعدك تطلع دموعك:\n\n1. شوف فيلم حزين أو مقطع مؤثر\n2. استمع لأغنية تحسسك\n3. اقرأ شي يلمس قلبك\n4. تذكر موقف مؤثر في حياتك\n5. اكتب كل اللي في قلبك ورقي - أحياناً الكلام يطلع دموعنا\n6. لو بعد كل ما سويت ما قدرت تبكي - مو مشكلة. أحياناً الدموع مو جاهزة.\n\n🌟 تذكر:\n\nحتى لو ما تبكت، مشاعرك صحيحة.\n\nأنا أسمعك. ممكن تحكيلي عن اللي يوجعك؟ 💜",
-          en: "I feel you... you want to cry but you can't 💙\n\nSometimes crying is stuck and won't come out, and this is painful.\n\nLet me help you:\n\n💡 Things that help you release tears:\n\n1. Watch a sad movie or touching clip\n2. Listen to a song that touches you\n3. Read something that touches your heart\n4. Remember a touching moment in your life\n5. Write everything in your heart on paper - sometimes words bring our tears\n6. If after all this you still can't cry - no problem. Sometimes tears aren't ready.\n\n🌟 Remember:\n\nEven if you don't cry, your feelings are valid.\n\nI'm listening. Can you tell me what's hurting you? 💜"
-        }
-      ],
-      crying_right_now: [
-        {
-          ar: "أنا معك... خذ وقتك في البكا 💙\n\nالبكا يفرغ القلب. ما تستعجل.\n\nبس أقلك:\n\n💡 بعد ما تخلص البكا:\n\n1. اشرب ماي بارد\n2. خذ نفس عميق\n3. امسح وشك\n4. ارتاح شوي\n\nأنا ما راح أروح... أنا موجود لما تجهز 💜",
-          en: "I'm with you... take your time crying 💙\n\nCrying empties the heart. Don't rush.\n\nBut let me tell you:\n\n💡 After you finish crying:\n\n1. Drink cold water\n2. Take a deep breath\n3. Wipe your face\n4. Rest a bit\n\nI won't leave... I'm here when you're ready 💜"
-        }
-      ],
-      angry: [
-        {
-          ar: "أشوفك غضبان... الغضب شعور قوي ومش طبيعي 💙\n\nأحياناً الناس والأمور تغضبنا، وهذا حقك.\n\nخليني أسألك:\n\n🔥 شو اللي غضبك؟ صار شي معين؟ شخص موقف؟\nمن متى وأنت تحس بالغضب؟\nحس إنك تحتاج تفرغ الغضب؟\n\n💡 أشياء تساعد تفرغ الغضب:\n\n1. العد للـ 10 ببطء\n2. خذ نفس عميق\n3. اترك المكان لبعض الوقت\n4. اكتب اللي في قلبك\n5. حرك جسمك - مشي سريع أو تمرين\n6. اضرب مخدة - هذا يفرغ\n\n🌟 تذكر:\n\nالغضب مو طولك. بيعدي.\n\nتحتاج تحكيلي عن اللي غضبك؟ أنا أسمعك 💜",
-          en: "I see you're angry... anger is a strong and natural feeling 💙\n\nSometimes people and situations make us angry, and that's your right.\n\nLet me ask you:\n\n🔥 What made you angry? Did something specific happen? A person? A situation?\nHow long have you been feeling angry?\nDo you feel you need to release the anger?\n\n💡 Things that help release anger:\n\n1. Count to 10 slowly\n2. Take a deep breath\n3. Leave the place for a while\n4. Write what's in your heart\n5. Move your body - fast walk or exercise\n6. Hit a pillow - this releases\n\n🌟 Remember:\n\nAnger won't last forever. It will pass.\n\nDo you need to tell me what made you angry? I'm listening 💜"
-        }
-      ],
-      happy: [
-        { 
-          ar: "ماشاء الله! يسعدني جداً إنك مبسوط اليوم! 😊✨\n\nالفرح نعمة كبيرة، ووجودك هنا عشان تشاركني فرحتك يدل على قلب جميل. شكراً إنك شاركتني هاللحظة الحلوة 💜\n\nخليني أسألك:\n\n🌟 شو اللي فرّحك اليوم؟ حابب تحكيلي عنه؟\nكيف تحس الحين؟ خفيف؟ مطمئن؟ ممتن؟ سعيد؟\nتبغى تحتفل بهالشعور الحلو بطريقة معينة؟\n\n💡 كيف تحافظ على هالشعور الجميل:\n\n1. اكتب 3 أشياء ممتن لها اليوم - الامتنان يضاعف الفرح\n2. شارك فرحتك مع شخص تحبه - الفرح يكبر لما ننشره\n3. سوِّ نشاط تحبه عشان تعزز هالشعور\n4. خذ لحظة تتذكر فيها هاللحظة - بعدين لما تحتاجها ترجعلها\n5. صور اللحظة - صورة، فيديو، أو حتى ملاحظة\n\n🌈 الحقيقة الحلوة:\n\nاللحظات الحلوة هذي هي اللي تستاهل نعيش عشانها. وأنت تستاهل كل الفرح والسعادة في الدنيا. خليك متمسك بهالشعور، وتذكره في الأيام الصعبة.\n\nوتذكر: الفرح مو أناني. فرحك يفرّح اللي حواليك. ابتسامتك تضيء يوم شخص ثاني. فخليك مبسوط وانشر الطاقة الحلوة هذي 🌻\n\nحابب تحكيلي أكثر عن يومك؟ أو عن اللي فرّحك؟ أحب أسمع! 💙", 
-          en: "Wonderful! I'm so happy you're happy today! 😊✨\n\nJoy is a big blessing, and being here to share your happiness with me shows a beautiful heart. Thank you for sharing this sweet moment with me 💜\n\nLet me ask you:\n\n🌟 What made you happy today? Want to tell me about it?\nHow do you feel now? Light? Content? Grateful? Happy?\nWant to celebrate this beautiful feeling in a specific way?\n\n💡 How to keep this beautiful feeling:\n\n1. Write 3 things you're grateful for today - gratitude multiplies joy\n2. Share your joy with someone you love - joy grows when we spread it\n3. Do an activity you love to reinforce this feeling\n4. Take a moment to remember this moment - later when you need it, return to it\n5. Capture the moment - a photo, video, or even a note\n\n🌈 The sweet truth:\n\nThese sweet moments are what we deserve to live for. And you deserve all the joy and happiness in the world. Hold on to this feeling, and remember it on difficult days.\n\nRemember: joy isn't selfish. Your happiness makes those around you happy. Your smile lights up someone else's day. So stay happy and spread this sweet energy 🌻\n\nWant to tell me more about your day? Or about what made you happy? I'd love to hear! 💙" 
-        }
-      ],
-      greeting: [
-        { 
-          ar: "أهلاً وسهلاً فيك! يسعدني وجودك هنا 💙\n\nهذا مكانك الآمن... تقدر تكون نفسك الحقيقية بدون أي حكم أو خوف. كل ما تحس فيه صحيح ومهم.\n\nأنا هنا أسمعك وأفهمك وأساعدك قدر المستطاع.\n\n🌙 كيف تحس اليوم؟\n\nسواء كنت مبسوط، حزين، قلقان، تعبان، أو حتى مو متأكد من شعورك - كله تمام. أنا هنا أسمعك وأساعدك.\n\nتحب تفضفض؟ تحتاج نصيحة؟ أو بس تبغى تتكلم؟ أنا معك... خذ راحتك 🌸", 
-          en: "Welcome! I'm happy you're here 💙\n\nThis is your safe space... you can be your true self without any judgment or fear. Everything you feel is valid and important.\n\nI'm here to listen, understand, and help as much as I can.\n\n🌙 How are you feeling today?\n\nWhether you're happy, sad, anxious, tired, or even unsure of your feeling - it's all okay. I'm here to listen and help.\n\nWant to vent? Need advice? Or just want to talk? I'm with you... take your time 🌸" 
-        }
-      ],
-      default: [
-        { 
-          ar: "أسمعك... وأشوف إنك حابب تتكلم أكثر 💙\n\nخذ راحتك... كل ما تشاركني تفاصيل أكثر، كل ما أقدر أفهمك أحسن وأساعدك بشكل أفضل.\n\nأنا هنا أسمعك بدون حكم.\n\n🌟 ممكن تحكيلي:\n\n• شو اللي صار بالضبط؟\n• كيف تحس تجاه الموضوع؟\n• شو اللي تحتاجه الحين؟ دعم؟ نصيحة؟ حلول؟ أو بس حد يسمعك؟\n\nأنا هنا معك... ما بحكم ولا بستعجل. خذ وقتك وقلي اللي في بالك 🤍", 
-          en: "I'm listening... and I see you want to talk more 💙\n\nTake your time... the more details you share, the better I can understand and help you.\n\nI'm here to listen without judgment.\n\n🌟 Can you tell me:\n\n• What exactly happened?\n• How do you feel about it?\n• What do you need now? Support? Advice? Solutions? Or just someone to listen?\n\nI'm here with you... I won't judge and I won't rush you. Take your time and tell me what's on your mind 🤍" 
-        },
-        { 
-          ar: "شكراً إنك شاركتني... أقدّر ثقتك فيّ 💜\n\nكيف تحس الحين بعد ما تكلمت؟ أحياناً الكلام بحد ذاته يخفف...\n\nأنا مهتم بحديثك.\n\n🌙 تحب نكمل النقاش؟\n\n• في شي معين تحتاج مساعدة فيه؟\n• تبغى نفكر في حلول عملية مع بعض؟\n• أو بس تحتاج حد يسمعك أكثر؟\n\nكل الخيارات تمام... أنا هنا لك 🌸", 
-          en: "Thanks for sharing with me... I appreciate your trust in me 💜\n\nHow do you feel now after talking? Sometimes talking itself helps...\n\nI care about what you say.\n\n🌙 Want to continue the discussion?\n\n• Is there something specific you need help with?\n• Want to think of practical solutions together?\n• Or just need someone to listen more?\n\nAll options are okay... I'm here for you 🌸" 
-        }
-      ]
-    };
 
-    // كلمات مفتاحية موسعة
-    const KEYWORDS = {
-      sad: ['حزين', 'حزن', 'زعلان', 'زعل', 'محزون', 'مهموم', 'كئيب', 'منكسر', 'broken', 'sad', 'depressed', 'down', 'upset', 'cry', 'crying', 'أبكي', 'بكي', 'دموع', 'دمعتي', 'نبكي', 'يبكي', 'broken heart', 'heartbroken'],
-      depressed: ['مكتئب', 'اكتئاب', 'depressed', 'depression', 'hopeless', 'يائس', 'مافي فايدة', 'تعبت من الحياة', 'ماني قادر', 'لا أمل', 'hopeless', 'no hope', 'want to die', 'end it', 'darkness', 'dark'],
-      anxious: ['قلقان', 'قلق', 'خايف', 'خوف', 'توتر', 'متوتر', 'anxious', 'worried', 'nervous', 'scared', 'fear', 'panic', 'panic attack', 'خيف', 'مخوف', 'مرتعب', 'رعب'],
-      lonely: ['وحيد', 'وحدة', 'لوحدي', 'lonely', 'alone', 'isolated', 'ماحد', 'محد', 'منسي', 'abandoned', 'nobody', 'no one'],
-      tired: ['تعبان', 'تعب', 'منهك', 'مرهق', 'exhausted', 'tired', 'burnt out', 'مالي خلق', 'منهار', 'لا طاقة', 'no energy'],
-      crying: ['أبكي', 'بكي', 'أريد أن أبكي', 'تبكي', 'يبكي', 'نبكي', 'crying', 'cry', 'want to cry', 'tears', 'دموع'],
-      want_to_cry: ['أبيبكي', 'ابي ابكي', 'اريد ابكي', 'أريد أن أبكي', 'want to cry', 'need to cry', 'feel like crying'],
-      crying_right_now: ['باكي', 'ابكي الحين', 'أبكي حاليا', 'crying now', 'am crying'],
-      angry: ['غضبان', 'معصب', 'زعلان', 'مقهور', 'angry', 'mad', 'furious', 'annoyed', 'غضب', 'screaming', 'pissed'],
-      happy: ['مبسوط', 'فرحان', 'سعيد', 'happy', 'great', 'good', 'amazing', 'wonderful', 'تمام', 'بخير', 'الحمدلله', 'joy', 'excited'],
-      greeting: ['هلا', 'مرحبا', 'السلام', 'هاي', 'hi', 'hello', 'hey', 'صباح', 'مساء', 'السلام عليكم', 'marhaba']
-    };
+        // تطبيق اللغة عند تحميل الصفحة
+        updateContentForLanguage(currentLang);
 
-    // الكلمات الإيجابية
-    const POSITIVE_WORDS = [
-      'أمل', 'حب', 'سلام', 'قوة', 'إيمان', 'صبر', 'شكر', 'تفاؤل', ' courage', 'joy', 'peace',
-      'محبة', 'رحمة', 'هدوء', 'طمأنينة', 'ثقة', 'أمان', 'سعادة', 'فرح', 'نجاح', 'إنجاز',
-      'optimism', 'gratitude', 'compassion', 'kindness', 'hope', 'faith', 'love', 'strength'
-    ];
 
-    // رسائل الألوان
-    const COLOR_MESSAGES = {
-      blue: { ar: 'الأزرق يرمز للهدوء والسكينة... تخيل نفسك عند البحر 🌊', en: 'Blue symbolizes calm and serenity... imagine yourself by the sea 🌊' },
-      purple: { ar: 'البنفسجي لون الروح والصوفية... يشعرك بالعمق والأمان 💜', en: 'Purple is the color of spirit and mysticism... makes you feel deep and safe 💜' },
-      green: { ar: 'الأخضر لون الطبيعة والنمو... تخيل نفسك في غابة خضراء 🌲', en: 'Green is the color of nature and growth... imagine yourself in a green forest 🌲' },
-      pink: { ar: 'الوردي لون الحب واللطف... شعّر بحب لنفسك 💗', en: 'Pink is the color of love and gentleness... feel love for yourself 💗' },
-      yellow: { ar: 'الأصفر لون الشفاء والدفء... تخيل شمس دافئة تضيء عليك ☀️', en: 'Yellow is the color of healing and warmth... imagine a warm sun shining on you ☀️' },
-      teal: { ar: 'التركواز لون التوازن والصفاء... اشعر بالسكينة داخل قلبك 💎', en: 'Teal is the color of balance and clarity... feel the serenity in your heart 💎' }
-    };
+        languageToggleButton.addEventListener('click', () => {
+            currentLang = (currentLang === 'ar' ? 'en' : 'ar');
+            updateContentForLanguage(currentLang);
+        });
 
-    // تمارين الراحة اليومية
-    const DAILY_RELAX_EXERCISES = [
-      { emoji: '🌸', ar: 'أغمض عينيك... تخيل زهرة تتفتح ببطء في حديقة هادئة', en: 'Close your eyes... imagine a flower slowly opening in a quiet garden', duration: 30 },
-      { emoji: '🌊', ar: 'تخيل موجات هادئة تداعب شاطئ رملي... تنفس مع كل موجة', en: 'Imagine gentle waves touching a sandy beach... breathe with each wave', duration: 30 },
-      { emoji: '☁️', ar: 'تخيل سحابة بيضاء ناعمة تحمل كل همومك بعيداً', en: 'Imagine a soft white cloud carrying all your worries away', duration: 30 },
-      { emoji: '🦋', ar: 'تخيل فراشة تهبط برفق على كتفك... أحس بالخفة والسلام', en: 'Imagine a butterfly gently landing on your shoulder... feel lightness and peace', duration: 30 },
-      { emoji: '🌙', ar: 'تخيل نور القمر يغمر غرفتك... كل شيء هادئ وآمن', en: 'Imagine moonlight filling your room... everything is quiet and safe', duration: 30 },
-      { emoji: '🍃', ar: 'تخيل ورقة شجر تتسقط برفق... كل شيء يهدأ ببطء', en: 'Imagine a leaf gently falling... everything slowly calms down', duration: 30 },
-      { emoji: '💎', ar: 'تخيل جوهرة زرقاء تتوهج في قلبك... اشعر بالهدوء والقوة', en: 'Imagine a blue gem glowing in your heart... feel calm and strength', duration: 30 },
-      { emoji: '🌅', ar: 'تخيل شمس تشرق ببطء... يوم جديد مليء بالأمل والفرح', en: 'Imagine a sun slowly rising... a new day full of hope and joy', duration: 30 },
-      { emoji: '🕊️', ar: 'تخيل حمامة بيضاء تحلق في السماء... حرية وسلام', en: 'Imagine a white dove flying in the sky... freedom and peace', duration: 30 },
-      { emoji: '⭐', ar: 'تخيل نجمة صغيرة تضيء في قلبك... نور الأمل', en: 'Imagine a small star shining in your heart... light of hope', duration: 30 }
-    ];
 
-    // مشاهد التخيل
-    const IMAGINE_SCENES = {
-      beach: {
-        ar: "🏖️ تخيل نفسك الآن على شاطئ هادئ...\n\nتسمع صوت أمواج البحر تداعب الرمال...\nنشعر بحرارة الشمس الدافئة على بشرتك...\nنسماء زرقاء صافية تمتد إلى ما لا نهاية...\nنسيم عليل يلامس وجهك برفق...\n\nأنت آمن... مرتاح... في سلام.\n\nخذ نفس عميق... اشعر بالهدوء يملأ كل كيانك.",
-        en: "🏖️ Imagine yourself now on a calm beach...\n\nYou hear the sound of waves gently caressing the sand...\nYou feel the warmth of the sun on your skin...\nA clear blue sky stretching endlessly...\nA gentle breeze touching your face softly...\n\nYou are safe... relaxed... at peace.\n\nTake a deep breath... feel the calm filling your entire being."
-      },
-      forest: {
-        ar: "🌲 تخيل نفسك في غابة خضراء هادئة...\n\nأشجار عالية تحميك وتظللك...\nأغاني الطيور تعزف أجمل الألحان...\nنهر صافٍ يتدفق بين الأشجار...\nهواء نقِي مليء برائحة الصنوبر والأعشاب...\n\nأنت محاط بالطبيعة... بسلام حقيقي.\n\nاستنشق بعمق... اشعر بالطاقة الإيجابية.",
-        en: "🌲 Imagine yourself in a quiet green forest...\n\nTall trees protecting and shading you...\nBirds singing the most beautiful melodies...\nA clear river flowing between the trees...\nPure air filled with the scent of pine and herbs...\n\nYou are surrounded by nature... true peace.\n\nBreathe deeply... feel the positive energy."
-      },
-      mountain: {
-        ar: "🏔️ تخيل نفسك على قمة جبل عالٍ...\n\nأنت فوق كل الهموم والقلق...\nمنظر رائع يمتد أمامك...\nغيوم بيضاء تمر تحتك...\nهواء نقي ومنعش...\n\nأنت قوي... فوق كل الصعاب.\n\nأشعر بالحرية والقوة تملاك.",
-        en: "🏔️ Imagine yourself on top of a high mountain...\n\nYou are above all worries and anxiety...\nA wonderful view stretches before you...\nWhite clouds passing beneath you...\nPure, refreshing air...\n\nYou are strong... above all difficulties.\n\nFeel freedom and strength filling you."
-      },
-      night: {
-        ar: "🌙 تخيل نفسك تحت سماء مليئة بالنجوم...\n\nآلاف النجوم تتلألأ فوقك...\nقمر منير ينير ليلك...\nسكينة عميكة تحيط بك...\nلا صوت إلا همسة النسيم...\n\nأنت صغير في هذا الكون العظيم...\nومع ذلك... مهم جداً.\n\nاشعر بسلام الليل يغمر قلبك.",
-        en: "🌙 Imagine yourself under a sky full of stars...\n\nThousands of stars twinkling above you...\nA bright moon illuminating your night...\nDeep serenity surrounding you...\nNo sound but the whisper of the breeze...\n\nYou are small in this vast universe...\nAnd yet... very important.\n\nFeel the peace of the night embracing your heart."
-      }
-    };
-
-    // ========== المتغيرات ==========
-    let isMuted = false;
-    let audioContext = null;
-    let rainSource = null;
-    let isRaining = true;
-    let currentColor = '#ffffff';
-    let isDrawing = false;
-    let memoryCards = [];
-    let flippedCards = [];
-    let memoryMoves = 0;
-    let bubbleScore = 0;
-    let bubbleInterval = null;
-    let breathInterval1 = null;
-    let breathInterval2 = null;
-    let bodyScanInterval = null;
-    let muscleInterval = null;
-    let imagineInterval = null;
-    let sleepInterval = null;
-    let numbers = [];
-    let currentNumber = 1;
-    let numbersTimer = null;
-    let selectedWords = [];
-    let currentLang = 'ar';
-
-    // ========== الدوال المساعدة ==========
-    function $(sel) { return document.querySelector(sel); }
-    function $$(sel) { return document.querySelectorAll(sel); }
-
-    // ========== تهيئة الخلفية ==========
-    function createStars() {
-      const container = $('#stars');
-      for (let i = 0; i < 150; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 50 + '%';
-        const size = Math.random() * 2 + 0.5;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        const duration = 2 + Math.random() * 3;
-        star.style.animationDuration = duration + 's';
-        star.style.animationDelay = Math.random() * duration + 's';
-        container.appendChild(star);
-      }
-    }
-
-    function createClouds() {
-      const container = $('#clouds');
-      for (let i = 0; i < 6; i++) {
-        const cloud = document.createElement('div');
-        cloud.className = 'cloud';
-        cloud.style.width = (Math.random() * 400 + 250) + 'px';
-        cloud.style.height = (Math.random() * 120 + 80) + 'px';
-        cloud.style.top = (Math.random() * 60) + '%';
-        cloud.style.left = (Math.random() * 100) + '%';
-        cloud.style.animationDuration = (Math.random() * 40 + 50) + 's';
-        cloud.style.animationDelay = (Math.random() * 30) + 's';
-        container.appendChild(cloud);
-      }
-    }
-
-    function createRain() {
-      const container = $('#rain');
-      container.innerHTML = '';
-      for (let i = 0; i < 150; i++) {
-        const drop = document.createElement('div');
-        drop.className = 'rain-drop';
-        drop.style.left = Math.random() * 100 + '%';
-        drop.style.width = (Math.random() * 1.5 + 0.5) + 'px';
-        drop.style.height = (Math.random() * 25 + 15) + 'px';
-        drop.style.animationDuration = (Math.random() * 0.6 + 0.6) + 's';
-        drop.style.animationDelay = (Math.random() * 2) + 's';
-        drop.style.opacity = Math.random() * 0.4 + 0.3;
-        container.appendChild(drop);
-      }
-    }
-
-    // ========== البرق والرعد ==========
-    function triggerLightning() {
-      const lightning = $('#lightning');
-      
-      // برق واقعي مع عدة ومضات
-      lightning.style.opacity = '0.5';
-      
-      setTimeout(() => {
-        lightning.style.opacity = '0';
-        
-        // ومضة ثانية
-        setTimeout(() => {
-          lightning.style.opacity = '0.35';
-          
-          setTimeout(() => {
-            lightning.style.opacity = '0';
-            
-            // ومضة ثالثة أصغر
-            setTimeout(() => {
-              lightning.style.opacity = '0.2';
-              setTimeout(() => {
-                lightning.style.opacity = '0';
-              }, 80);
-            }, 150);
-          }, 100);
-        }, 80);
-      }, 60);
-
-      // صوت الرعد بعد البرق
-      if (!isMuted) {
-        setTimeout(() => playThunder(), 600 + Math.random() * 2000);
-      }
-    }
-
-    function playThunder() {
-      if (!audioContext) return;
-      
-      const duration = 3;
-      const buffer = audioContext.createBuffer(1, duration * audioContext.sampleRate, audioContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      
-      for (let i = 0; i < buffer.length; i++) {
-        const t = i / audioContext.sampleRate;
-        // رعد واقعي مع ترددات منخفضة
-        const envelope = Math.exp(-t * 1.5);
-        const rumble = Math.sin(t * 15) * envelope;
-        const crack = Math.sin(t * 80) * Math.exp(-t * 5) * (Math.random() > 0.98 ? 1 : 0);
-        data[i] = ((Math.random() * 2 - 1) * 0.3 + rumble * 0.5 + crack * 0.2) * envelope;
-      }
-      
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      
-      const filter = audioContext.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 150;
-      
-      const gain = audioContext.createGain();
-      gain.gain.value = 0.06;
-      
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioContext.destination);
-      source.start();
-    }
-
-    function scheduleLightning() {
-      const delay = 12000 + Math.random() * 25000;
-      setTimeout(() => {
-        triggerLightning();
-        scheduleLightning();
-      }, delay);
-    }
-
-    // ========== صوت المطر ==========
-    let audioInitialized = false;
-    
-    function initAudio() {
-      if (audioInitialized || audioContext) return;
-      
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      audioInitialized = true;
-      
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      
-      // إنشاء صوت المطر الواقعي
-      const bufferSize = 2 * audioContext.sampleRate;
-      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      
-      let lastOut = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        data[i] = (lastOut + 0.02 * white) / 1.02;
-        lastOut = data[i];
-        data[i] *= 3;
-      }
-      
-      rainSource = audioContext.createBufferSource();
-      rainSource.buffer = buffer;
-      rainSource.loop = true;
-      
-      const filter = audioContext.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 800;
-      
-      const gain = audioContext.createGain();
-      gain.gain.value = 0.05;
-      
-      rainSource.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioContext.destination);
-      rainSource.start();
-    }
-    
-    let audioReady = false;
-
-    function ensureAudioStarted() {
-      if (!audioContext) {
-        initAudio();
-      }
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      if (audioContext && audioContext.state === 'running' && !audioReady) {
-        audioReady = true;
-        detachAudioUnlockListeners();
-      }
-    }
-
-    function attachAudioUnlockListeners() {
-      ['touchstart', 'pointerdown', 'mousedown', 'click', 'keydown'].forEach(evt => {
-        document.addEventListener(evt, ensureAudioStarted, { passive: true, capture: true });
-      });
-      document.addEventListener('visibilitychange', ensureAudioStarted);
-    }
-
-    function detachAudioUnlockListeners() {
-      ['touchstart', 'pointerdown', 'mousedown', 'click', 'keydown'].forEach(evt => {
-        document.removeEventListener(evt, ensureAudioStarted, { capture: true });
-      });
-      document.removeEventListener('visibilitychange', ensureAudioStarted);
-    }
-
-    // ========== الاقتباسات ==========
-    function showQuote() {
-      const today = new Date().toDateString();
-      const savedDate = localStorage.getItem('quoteDate');
-      let quoteIndex;
-      
-      if (savedDate === today) {
-        quoteIndex = parseInt(localStorage.getItem('quoteIndex')) || 0;
-      } else {
-        quoteIndex = Math.floor(Math.random() * QUOTES.length);
-        localStorage.setItem('quoteDate', today);
-        localStorage.setItem('quoteIndex', quoteIndex);
-      }
-      
-      const quote = QUOTES[quoteIndex];
-      $('#quoteAr').textContent = quote.ar;
-      $('#quoteEn').textContent = quote.en;
-    }
-
-    function newQuote() {
-      let newIndex;
-      do {
-        newIndex = Math.floor(Math.random() * QUOTES.length);
-      } while (newIndex === parseInt(localStorage.getItem('quoteIndex')));
-      
-      localStorage.setItem('quoteIndex', newIndex);
-      const quote = QUOTES[newIndex];
-      $('#quoteAr').textContent = quote.ar;
-      $('#quoteEn').textContent = quote.en;
-    }
-
-    function speakQuote() {
-      const enText = $('#quoteEn').textContent;
-      const cleanEnText = enText.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-      
-      speechSynthesis.cancel();
-      
-      let voices = speechSynthesis.getVoices();
-      
-      if (voices.length === 0) {
-        speechSynthesis.onvoiceschanged = () => {
-          voices = speechSynthesis.getVoices();
-          speakWithVoices();
-        };
-      } else {
-        speakWithVoices();
-      }
-      
-      function speakWithVoices() {
-        const englishVoice = voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('female'))
-                          || voices.find(v => v.lang === 'en-US' && (v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('fiona') || v.name.toLowerCase().includes('karen')))
-                          || voices.find(v => v.lang === 'en-US' && (v.name.toLowerCase().includes('david') === false && v.name.toLowerCase().includes('daniel') === false))
-                          || voices.find(v => v.lang === 'en-GB' && v.name.toLowerCase().includes('female'))
-                          || voices.find(v => v.lang === 'en-AU' && v.name.toLowerCase().includes('female'))
-                          || voices.find(v => v.lang === 'en-US' && v.name.includes('Google') === false);
-        
-        const enUtter = new SpeechSynthesisUtterance(cleanEnText);
-        enUtter.lang = 'en-US';
-        enUtter.rate = 1.0;
-        enUtter.pitch = 1.05;
-        enUtter.volume = 0.9;
-        if (englishVoice) enUtter.voice = englishVoice;
-        
-        speechSynthesis.speak(enUtter);
-      }
-    }
-
-    // ========== المحادثة الذكية ==========
-    function detectMood(text) {
-      const lowerText = text.toLowerCase();
-      
-      let bestMatch = 'default';
-      let maxMatches = 0;
-      
-      for (const [mood, keywords] of Object.entries(KEYWORDS)) {
-        const matches = keywords.filter(kw => lowerText.includes(kw)).length;
-        if (matches > maxMatches) {
-          maxMatches = matches;
-          bestMatch = mood;
-        }
-      }
-      
-      return bestMatch;
-    }
-
-    function getAIResponse(text) {
-      const mood = detectMood(text);
-      const responses = AI_RESPONSES[mood] || AI_RESPONSES.default;
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-
-    function addMessage(text, isUser) {
-      const chatBox = $('#chatBox');
-      
-      if (chatBox.querySelector('.text-center')) {
-        chatBox.innerHTML = '';
-      }
-      
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `${isUser ? 'user-msg mr-auto' : 'ai-msg ml-auto'} max-w-[85%] p-4 mb-3`;
-      
-      const formattedText = text.replace(/\n\n/g, '</p><p class="mt-3">').replace(/\n/g, '<br>');
-      
-      msgDiv.innerHTML = `<p class="text-white leading-relaxed">${formattedText}</p>`;
-      
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      
-      saveChat();
-    }
-
-    function showTyping() {
-      const chatBox = $('#chatBox');
-      
-      if (chatBox.querySelector('.text-center')) {
-        chatBox.innerHTML = '';
-      }
-      
-      const typingDiv = document.createElement('div');
-      typingDiv.id = 'typing';
-      typingDiv.className = 'ai-msg ml-auto max-w-[80%] p-4 mb-3';
-      typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-      chatBox.appendChild(typingDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function removeTyping() {
-      const typing = $('#typing');
-      if (typing) typing.remove();
-    }
-
-    function handleChat(e) {
-      e.preventDefault();
-      const input = $('#chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-      
-      addMessage(text, true);
-      input.value = '';
-      
-      showTyping();
-      
-      setTimeout(() => {
-        removeTyping();
-        const response = getAIResponse(text);
-        const isArabic = /[\u0600-\u06FF]/.test(text);
-        addMessage(isArabic ? response.ar : response.en, false);
-      }, 1500 + Math.random() * 1000);
-    }
-
-    function saveChat() {
-      const chatBox = $('#chatBox');
-      localStorage.setItem('chat', chatBox.innerHTML);
-    }
-
-    function loadChat() {
-      const saved = localStorage.getItem('chat');
-      if (saved) {
-        $('#chatBox').innerHTML = saved;
-      }
-    }
-
-    function clearChat() {
-      localStorage.removeItem('chat');
-      $('#chatBox').innerHTML = `
-        <div class="text-center text-slate-400 py-12">
-          <div class="text-4xl mb-3">🌙</div>
-          <p>أهلاً فيك... كيف تحس اليوم؟</p>
-          <p class="text-sm mt-2">Hi there... How are you feeling today?</p>
-          <p class="text-xs text-slate-500 mt-4">أنا هنا أسمعك وأفهمك... تفضفض براحتك</p>
-        </div>
-      `;
-    }
-
-    // ========== تبويبات التمارين ==========
-    $$('.exercise-tab').forEach(tab => {
-      tab.onclick = () => {
-        $$('.exercise-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        const exerciseId = tab.dataset.exercise;
-        $$('.exercise-content').forEach(c => c.classList.add('hidden'));
-        $(`#exercise-${exerciseId}`).classList.remove('hidden');
-        
-        stopAllExercises();
-      };
-    });
-
-    function stopAllExercises() {
-      stopBreathing1();
-      stopBreathing2();
-      stopSleepRoutine();
-      stopBodyScan();
-      stopMuscle();
-      stopImagine();
-    }
-
-    // ========== تمرين التنفس 4-4-6 ==========
-    const breathPhases1 = [
-      { text: 'شهيق 🌬️', count: 4, scale: 1.3, progress: 'شهيق بعمق...' },
-      { text: 'حبس ⏸️', count: 4, scale: 1.3, progress: 'احبس نفسك...' },
-      { text: 'زفير 💨', count: 6, scale: 1, progress: 'زفير ببطء...' }
-    ];
-
-    function startBreathing1() {
-      if (breathInterval1) return;
-      
-      let phase = 0;
-      let count = breathPhases1[0].count;
-      
-      updateBreathUI1();
-      
-      breathInterval1 = setInterval(() => {
-        count--;
-        $('#breathCount1').textContent = count;
-        
-        if (count <= 0) {
-          phase = (phase + 1) % 3;
-          count = breathPhases1[phase].count;
-          updateBreathUI1();
-          updateStepDots('#exercise-breathing-4-4-6', phase + 1);
-        }
-      }, 1000);
-    }
-
-    function updateBreathUI1() {
-      const phase = breathPhases1[phase];
-      $('#breathText1').textContent = phase.text;
-      $('#breathCount1').textContent = phase.count;
-      $('#breathCircle1').style.transform = `scale(${phase.scale})`;
-      $('#breathProgress1').textContent = phase.progress;
-    }
-
-    function stopBreathing1() {
-      if (breathInterval1) {
-        clearInterval(breathInterval1);
-        breathInterval1 = null;
-      }
-      $('#breathText1').textContent = 'ابدأ';
-      $('#breathCount1').textContent = '—';
-      $('#breathCircle1').style.transform = 'scale(1)';
-      $('#breathProgress1').textContent = 'اضغط "ابدأ" للبدء';
-      resetStepDots('#exercise-breathing-4-4-6');
-    }
-
-    // ========== تمرين التنفس 4-7-8 ==========
-    const breathPhases2 = [
-      { text: 'شهيق 🌬️', count: 4, scale: 1.3, progress: 'شهيق هادئ...' },
-      { text: 'حبس ⏸️', count: 6, scale: 1.3, progress: 'احبس نفسك بلطف...' },
-      { text: 'زفير 💨', count: 8, scale: 1, progress: 'زفير طويل ومريح...' }
-    ];
-
-    function startBreathing2() {
-      if (breathInterval2) return;
-      
-      let phase = 0;
-      let count = breathPhases2[0].count;
-      
-      updateBreathUI2();
-      
-      breathInterval2 = setInterval(() => {
-        count--;
-        $('#breathCount2').textContent = count;
-        
-        if (count <= 0) {
-          phase = (phase + 1) % 3;
-          count = breathPhases2[phase].count;
-          updateBreathUI2();
-          updateStepDots('#exercise-breathing-4-7-8', phase + 1);
-        }
-      }, 1000);
-    }
-
-    function updateBreathUI2() {
-      const phase = breathPhases2[phase];
-      $('#breathText2').textContent = phase.text;
-      $('#breathCount2').textContent = phase.count;
-      $('#breathCircle2').style.transform = `scale(${phase.scale})`;
-      $('#breathProgress2').textContent = phase.progress;
-    }
-
-    function stopBreathing2() {
-      if (breathInterval2) {
-        clearInterval(breathInterval2);
-        breathInterval2 = null;
-      }
-      $('#breathText2').textContent = 'ابدأ';
-      $('#breathCount2').textContent = '—';
-      $('#breathCircle2').style.transform = 'scale(1)';
-      $('#breathProgress2').textContent = 'اضغط "ابدأ" للبدء';
-      resetStepDots('#exercise-breathing-4-7-8');
-    }
-
-    // ========== المسح الجسمي ==========
-    const bodyScanSteps = [
-      { step: 1, text: 'ركز على جبينك... اترك أي توتر هناك', duration: 10 },
-      { step: 2, text: 'استرخِ عينيك وفكك... دعهم يرتاحون', duration: 10 },
-      { step: 3, text: 'افكّ أسنانك... استرخِ لسانك وشفتيك', duration: 10 },
-      { step: 4, text: 'استرخِ كتفيك... دعهم يهبطون للأسفل', duration: 10 },
-      { step: 5, text: 'تنفس بعمق... املأ صدرك بالهواء', duration: 10 },
-      { step: 6, text: 'استرخِ يديك... دع أصابعك ترتاح', duration: 10 },
-      { step: 7, text: 'استرخِ ساقيك وقدميك... أطلق كل التوتر', duration: 10 }
-    ];
-
-    function startBodyScan() {
-      if (bodyScanInterval) return;
-      
-      let currentStep = 0;
-      let count = bodyScanSteps[0].duration;
-      
-      $('#bodyScanProgress').textContent = bodyScanSteps[0].text;
-      highlightBodyScanStep(1);
-      
-      bodyScanInterval = setInterval(() => {
-        count--;
-        $('#bodyScanProgress').textContent = `${bodyScanSteps[currentStep].text} (${count})`;
-        
-        if (count <= 0) {
-          currentStep++;
-          if (currentStep < bodyScanSteps.length) {
-            count = bodyScanSteps[currentStep].duration;
-            $('#bodyScanProgress').textContent = bodyScanSteps[currentStep].text;
-            highlightBodyScanStep(currentStep + 1);
-          } else {
-            $('#bodyScanProgress').textContent = '✅ اكتمل التمرين! استرخِ الآن...';
-            clearInterval(bodyScanInterval);
-            bodyScanInterval = null;
-            resetBodyScanSteps();
-          }
-        }
-      }, 1000);
-    }
-
-    function highlightBodyScanStep(stepNum) {
-      $$('.body-scan-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-      const step = $(`.body-scan-step[data-step="${stepNum}"]`);
-      if (step) step.style.background = 'rgba(124, 141, 176, 0.5)';
-    }
-
-    function resetBodyScanSteps() {
-      $$('.body-scan-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-    }
-
-    function stopBodyScan() {
-      if (bodyScanInterval) {
-        clearInterval(bodyScanInterval);
-        bodyScanInterval = null;
-      }
-      $('#bodyScanProgress').textContent = 'اضغط "ابدأ" للبدء';
-      resetBodyScanSteps();
-    }
-
-    // ========== الاسترخاء العضلي ==========
-    const muscleSteps = [
-      { step: 1, text: 'شد عضلات القدمين بقوة 5 ثواني', duration: 5 },
-      { step: 2, text: 'استرخِ... أحس بالراحة', duration: 3 },
-      { step: 3, text: 'شد عضلات الساقين 5 ثواني', duration: 5 },
-      { step: 4, text: 'استرخِ... أحس بالراحة', duration: 3 },
-      { step: 5, text: 'شد عضلات اليدين 5 ثواني', duration: 5 },
-      { step: 6, text: 'استرخِ... أحس بالراحة', duration: 3 },
-      { step: 7, text: 'شد عضلات الكتفين 5 ثواني', duration: 5 },
-      { step: 8, text: 'استرخِ... أحس بالراحة', duration: 3 },
-      { step: 9, text: 'شد عضلات وجهك 5 ثواني', duration: 5 },
-      { step: 10, text: 'استرخِ... أحس بالراحة في كل جسمك', duration: 5 }
-    ];
-
-    function startMuscle() {
-      if (muscleInterval) return;
-      
-      let currentStep = 0;
-      let count = muscleSteps[0].duration;
-      
-      $('#muscleProgress').textContent = muscleSteps[0].text;
-      highlightMuscleStep(1);
-      
-      muscleInterval = setInterval(() => {
-        count--;
-        $('#muscleProgress').textContent = `${muscleSteps[currentStep].text} (${count})`;
-        
-        if (count <= 0) {
-          currentStep++;
-          if (currentStep < muscleSteps.length) {
-            count = muscleSteps[currentStep].duration;
-            $('#muscleProgress').textContent = muscleSteps[currentStep].text;
-            const stepNum = Math.floor(currentStep / 2) + 1;
-            highlightMuscleStep(stepNum);
-          } else {
-            $('#muscleProgress').textContent = '✅ اكتمل التمرين! جسمك مسترخي الآن...';
-            clearInterval(muscleInterval);
-            muscleInterval = null;
-            resetMuscleSteps();
-          }
-        }
-      }, 1000);
-    }
-
-    function highlightMuscleStep(stepNum) {
-      $$('.muscle-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-      const step = $(`.muscle-step[data-step="${stepNum}"]`);
-      if (step) step.style.background = 'rgba(124, 141, 176, 0.5)';
-    }
-
-    function resetMuscleSteps() {
-      $$('.muscle-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-    }
-
-    function stopMuscle() {
-      if (muscleInterval) {
-        clearInterval(muscleInterval);
-        muscleInterval = null;
-      }
-      $('#muscleProgress').textContent = 'اضغط "ابدأ" للبدء';
-      resetMuscleSteps();
-    }
-
-    // ========== التخيل الموجه ==========
-    let selectedScene = null;
-
-    $$('.scene-card').forEach(card => {
-      card.onclick = () => {
-        $$('.scene-card').forEach(c => c.style.background = 'rgba(0,0,0,0.2)');
-        card.style.background = 'rgba(124, 141, 176, 0.5)';
-        selectedScene = card.dataset.scene;
-        
-        const scene = IMAGINE_SCENES[selectedScene];
-        $('#imagineContent').innerHTML = `
-          <p class="text-white leading-relaxed">${scene.ar.replace(/\n/g, '<br>')}</p>
-          <p class="text-slate-400 mt-4 text-sm leading-relaxed">${scene.en.replace(/\n/g, '<br>')}</p>
-        `;
-      };
-    });
-
-    function startImagine() {
-      if (!selectedScene) {
-        $('#imagineProgress').textContent = 'اختر مشهداً أولاً';
-        return;
-      }
-      
-      if (imagineInterval) return;
-      
-      const scene = IMAGINE_SCENES[selectedScene];
-      let count = 0;
-      
-      imagineInterval = setInterval(() => {
-        count++;
-        $('#imagineProgress').textContent = `استرخِ... استنشق عميقاً (${count})`;
-        
-        if (count >= 60) {
-          $('#imagineProgress').textContent = '✅ انتهى التمرين. أحس بالسلام...';
-          clearInterval(imagineInterval);
-          imagineInterval = null;
-        }
-      }, 1000);
-    }
-
-    function stopImagine() {
-      if (imagineInterval) {
-        clearInterval(imagineInterval);
-        imagineInterval = null;
-      }
-      $('#imagineProgress').textContent = '';
-    }
-
-    // ========== روتين النوم ==========
-    const sleepSteps = [
-      { step: 1, text: 'خفف الإضاءة وخلي الجو هادئ حولك', duration: 12 },
-      { step: 2, text: 'أبعد الجوال وركز على تنفسك الهادئ', duration: 12 },
-      { step: 3, text: 'اشرب شيء دافئ يساعدك على الاسترخاء', duration: 12 },
-      { step: 4, text: 'اجلس براحة واسترخِ كتفيك ورقبتك', duration: 12 },
-      { step: 5, text: 'قل لنفسك: أنا آمن وجسمي يستحق الراحة', duration: 12 }
-    ];
-
-    function startSleepRoutine() {
-      if (sleepInterval) return;
-
-      let currentStep = 0;
-      let count = sleepSteps[0].duration;
-
-      $('#sleepProgress').textContent = sleepSteps[0].text;
-      highlightSleepStep(1);
-
-      sleepInterval = setInterval(() => {
-        count--;
-        $('#sleepProgress').textContent = `${sleepSteps[currentStep].text} (${count})`;
-
-        if (count <= 0) {
-          currentStep++;
-          if (currentStep < sleepSteps.length) {
-            count = sleepSteps[currentStep].duration;
-            $('#sleepProgress').textContent = sleepSteps[currentStep].text;
-            highlightSleepStep(currentStep + 1);
-          } else {
-            $('#sleepProgress').textContent = '✅ انتهى الروتين. خذ نفس عميق واستعد للنوم...';
-            clearInterval(sleepInterval);
-            sleepInterval = null;
-            resetSleepSteps();
-          }
-        }
-      }, 1000);
-    }
-
-    function highlightSleepStep(stepNum) {
-      $$('.sleep-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-      const step = $(`.sleep-step[data-step="${stepNum}"]`);
-      if (step) step.style.background = 'rgba(124, 141, 176, 0.5)';
-    }
-
-    function resetSleepSteps() {
-      $$('.sleep-step').forEach(s => s.style.background = 'rgba(0,0,0,0.2)');
-    }
-
-    function stopSleepRoutine() {
-      if (sleepInterval) {
-        clearInterval(sleepInterval);
-        sleepInterval = null;
-      }
-      $('#sleepProgress').textContent = 'اضغط "ابدأ" للبدء';
-      resetSleepSteps();
-    }
-
-    // ========== دوال مساعدة للتمارين ==========
-    function updateStepDots(containerId, currentStep) {
-      const container = $(containerId);
-      const dots = container.querySelectorAll('.step-dot');
-      dots.forEach((dot, index) => {
-        dot.classList.remove('active', 'completed');
-        if (index + 1 < currentStep) {
-          dot.classList.add('completed');
-        } else if (index + 1 === currentStep) {
-          dot.classList.add('active');
-        }
-      });
-    }
-
-    function resetStepDots(containerId) {
-      const container = $(containerId);
-      const dots = container.querySelectorAll('.step-dot');
-      dots.forEach(dot => dot.classList.remove('active', 'completed'));
-    }
-
-    // ========== تبويبات الألعاب ==========
-    $$('.game-tab').forEach(tab => {
-      tab.onclick = () => {
-        $$('.game-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        const gameId = tab.dataset.game;
-        $$('.game-content').forEach(c => c.classList.add('hidden'));
-        $(`#game-${gameId}`).classList.remove('hidden');
-      };
-    });
-
-    // ========== لعبة الذاكرة ==========
-    function initMemoryGame() {
-      const emojis = ['🌙', '⭐', '🌸', '🦋', '🌈', '💜', '🌙', '⭐', '🌸', '🦋', '🌈', '💜'];
-      memoryCards = emojis.sort(() => Math.random() - 0.5);
-      flippedCards = [];
-      memoryMoves = 0;
-      $('#memoryMoves').textContent = '0';
-      
-      const container = $('#memoryGame');
-      container.innerHTML = '';
-      
-      memoryCards.forEach((emoji, i) => {
-        const card = document.createElement('div');
-        card.className = 'memory-card';
-        card.dataset.index = i;
-        card.innerHTML = `
-          <div class="memory-card-inner">
-            <div class="memory-card-front">❓</div>
-            <div class="memory-card-back">${emoji}</div>
-          </div>
-        `;
-        card.onclick = () => flipCard(card, i);
-        container.appendChild(card);
-      });
-    }
-
-    function flipCard(card, index) {
-      if (flippedCards.length >= 2 || card.classList.contains('flipped')) return;
-      
-      card.classList.add('flipped');
-      flippedCards.push({ card, index });
-      
-      if (flippedCards.length === 2) {
-        memoryMoves++;
-        $('#memoryMoves').textContent = memoryMoves;
-        
-        const [first, second] = flippedCards;
-        
-        if (memoryCards[first.index] === memoryCards[second.index]) {
-          flippedCards = [];
+        // 4. عداد الزوار (هذا العداد يحسب زياراتك أنت فقط باستخدام localStorage)
+        const visitorCountElement = document.getElementById('visitorCount');
+        let visitorCount = localStorage.getItem('page_visits');
+        if (visitorCount) {
+            visitorCount = parseInt(visitorCount) + 1;
         } else {
-          setTimeout(() => {
-            first.card.classList.remove('flipped');
-            second.card.classList.remove('flipped');
-            flippedCards = [];
-          }, 1000);
+            visitorCount = 1;
         }
-      }
-    }
+        localStorage.setItem('page_visits', visitorCount);
+        visitorCountElement.textContent = visitorCount;
 
-    // ========== لوحة الرسم ==========
-    function initCanvas() {
-      const canvas = $('#drawCanvas');
-      const ctx = canvas.getContext('2d');
-      
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.strokeStyle = currentColor;
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      
-      function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-        return { x, y };
-      }
-      
-      canvas.onmousedown = canvas.ontouchstart = (e) => {
-        e.preventDefault();
-        isDrawing = true;
-        const pos = getPos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-      };
-      
-      canvas.onmousemove = canvas.ontouchmove = (e) => {
-        if (!isDrawing) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-      };
-      
-      canvas.onmouseup = canvas.ontouchend = () => {
-        isDrawing = false;
-      };
-      
-      $$('.color-btn').forEach(btn => {
-        btn.onclick = () => {
-          currentColor = btn.dataset.color;
-          ctx.strokeStyle = currentColor;
-          $$('.color-btn').forEach(b => b.style.borderColor = 'transparent');
-          btn.style.borderColor = '#94a3b8';
-        };
-      });
-      
-      $('#clearCanvas').onclick = () => {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      };
-      
-      $('#saveCanvas').onclick = () => {
-        const link = document.createElement('a');
-        link.download = 'رسمتي.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      };
-    }
+        // ملاحظة: لعداد زوار عالمي يراه الجميع، ستحتاج إلى backend (خادم وقاعدة بيانات).
 
-    // ========== لعبة الفقاعات ==========
-    function startBubbles() {
-      if (bubbleInterval) return;
-      
-      bubbleScore = 0;
-      $('#bubbleScore').textContent = '0';
-      $('#bubbleGame').innerHTML = '';
-      
-      bubbleInterval = setInterval(createBubble, 800);
-    }
+        // 5. رسائل الزوار (كتاب الضيوف - تخزين محلي فقط)
+        const guestbookForm = document.getElementById('guestbookForm');
+        const visitorNameInput = document.getElementById('visitorName');
+        const visitorMessageInput = document.getElementById('visitorMessage');
+        const messagesList = document.getElementById('messagesList');
 
-    function createBubble() {
-      const container = $('#bubbleGame');
-      const bubble = document.createElement('div');
-      bubble.className = 'absolute rounded-full cursor-pointer transition-transform hover:scale-110';
-      
-      const size = 30 + Math.random() * 40;
-      bubble.style.width = size + 'px';
-      bubble.style.height = size + 'px';
-      bubble.style.left = Math.random() * (container.offsetWidth - size) + 'px';
-      bubble.style.bottom = '0';
-      bubble.style.background = `rgba(${100 + Math.random() * 100}, ${150 + Math.random() * 100}, ${200 + Math.random() * 55}, 0.6)`;
-      bubble.style.animation = `rise ${3 + Math.random() * 2}s linear forwards`;
-      
-      bubble.onclick = () => {
-        bubble.style.transform = 'scale(0)';
-        bubbleScore++;
-        $('#bubbleScore').textContent = bubbleScore;
-        setTimeout(() => bubble.remove(), 200);
-      };
-      
-      container.appendChild(bubble);
-      
-      setTimeout(() => {
-        if (bubble.parentNode) bubble.remove();
-      }, 5000);
-    }
-
-    // ========== لعبة ترتيب الأرقام ==========
-    function initNumbersGame() {
-      numbers = Array.from({ length: 10 }, (_, i) => i + 1);
-      numbers.sort(() => Math.random() - 0.5);
-      currentNumber = 1;
-      $('#nextNumber').textContent = currentNumber;
-      
-      const container = $('#numbersGame');
-      container.innerHTML = '';
-      
-      numbers.forEach(num => {
-        const tile = document.createElement('div');
-        tile.className = 'number-tile';
-        tile.textContent = num;
-        tile.dataset.number = num;
-        tile.onclick = () => handleNumberClick(tile, num);
-        container.appendChild(tile);
-      });
-    }
-
-    function handleNumberClick(tile, num) {
-      if (num === currentNumber) {
-        tile.classList.add('correct');
-        currentNumber++;
-        $('#nextNumber').textContent = currentNumber > 10 ? '✅' : currentNumber;
-        
-        if (currentNumber > 10) {
-          $('#nextNumber').textContent = '✅ أكملت!';
+        // تحميل الرسائل الموجودة عند تحميل الصفحة
+        function loadMessages() {
+            messagesList.innerHTML = ''; // مسح الرسائل الموجودة
+            const messages = JSON.parse(localStorage.getItem('guestbook_messages')) || [];
+            messages.forEach(msg => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${msg.name}</strong> - <span>${new Date(msg.timestamp).toLocaleString()}</span><p>${msg.message}</p>`;
+                messagesList.prepend(li); // إضافة الرسائل الأحدث في الأعلى
+            });
         }
-      }
-    }
 
-    function resetNumbers() {
-      initNumbersGame();
-      $('#numbersTimer').textContent = '00:00';
-    }
+        // عند إرسال النموذج
+        guestbookForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // منع تحديث الصفحة
 
-    // ========== لعبة الكلمات الإيجابية ==========
-    function initWordsGame() {
-      const shuffledWords = [...POSITIVE_WORDS].sort(() => Math.random() - 0.5).slice(0, 15);
-      selectedWords = [];
-      $('#selectedWords').textContent = '0';
-      $('#selectedWordsList').innerHTML = '';
-      
-      const container = $('#wordsGame');
-      container.innerHTML = '';
-      
-      shuffledWords.forEach(word => {
-        const bubble = document.createElement('span');
-        bubble.className = 'word-bubble';
-        bubble.textContent = word;
-        bubble.onclick = () => selectWord(bubble, word);
-        container.appendChild(bubble);
-      });
-    }
+            const name = visitorNameInput.value;
+            const message = visitorMessageInput.value;
+            const timestamp = new Date().toISOString(); // تاريخ ووقت الإرسال
 
-    function selectWord(bubble, word) {
-      if (selectedWords.includes(word)) return;
-      if (selectedWords.length >= 10) return;
-      
-      bubble.classList.add('selected');
-      selectedWords.push(word);
-      $('#selectedWords').textContent = selectedWords.length;
-      
-      const tag = document.createElement('span');
-      tag.className = 'bg-green-500/30 text-green-300 px-2 py-1 rounded-full text-sm';
-      tag.textContent = word;
-      $('#selectedWordsList').appendChild(tag);
-    }
+            if (name && message) {
+                const messages = JSON.parse(localStorage.getItem('guestbook_messages')) || [];
+                messages.push({ name, message, timestamp });
+                localStorage.setItem('guestbook_messages', JSON.stringify(messages));
 
-    function resetWords() {
-      initWordsGame();
-    }
+                visitorNameInput.value = '';
+                visitorMessageInput.value = '';
+                loadMessages(); // إعادة تحميل الرسائل لعرض الجديدة
+            }
+        });
 
-    // ========== لعبة الراحة اليومية ==========
-    let relaxInterval = null;
-
-    function initRelaxGame() {
-      const today = new Date().toDateString();
-      const savedExercise = JSON.parse(localStorage.getItem('dailyRelax') || '{}');
-      
-      let exercise;
-      if (savedExercise.date === today && !savedExercise.reset) {
-        exercise = DAILY_RELAX_EXERCISES[savedExercise.index];
-      } else {
-        const index = Math.floor(Math.random() * DAILY_RELAX_EXERCISES.length);
-        exercise = DAILY_RELAX_EXERCISES[index];
-        localStorage.setItem('dailyRelax', JSON.stringify({ date: today, index, reset: false }));
-      }
-      
-      $('#relaxEmoji').textContent = exercise.emoji;
-      $('#relaxText').textContent = exercise.ar + '\n' + exercise.en;
-      $('#relaxTimer').textContent = formatTime(exercise.duration);
-      
-      $('#relaxContent').dataset.ar = exercise.ar;
-      $('#relaxContent').dataset.en = exercise.en;
-      $('#relaxContent').dataset.duration = exercise.duration;
-    }
-
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function startRelax() {
-      if (relaxInterval) return;
-      
-      let remaining = parseInt($('#relaxContent').dataset.duration);
-      const ar = $('#relaxContent').dataset.ar;
-      const en = $('#relaxContent').dataset.en;
-      
-      $('#relaxText').innerHTML = ar + '<br><span class="text-slate-400 text-sm">' + en + '</span>';
-      
-      relaxInterval = setInterval(() => {
-        remaining--;
-        $('#relaxTimer').textContent = formatTime(remaining);
-        
-        if (remaining <= 0) {
-          $('#relaxText').innerHTML = '✅ انتهى التمرين<br><span class="text-slate-400 text-sm">Exercise complete</span>';
-          $('#relaxTimer').textContent = '🌸';
-          clearInterval(relaxInterval);
-          relaxInterval = null;
-        }
-      }, 1000);
-    }
-
-    function resetRelax() {
-      if (relaxInterval) {
-        clearInterval(relaxInterval);
-        relaxInterval = null;
-      }
-      const saved = JSON.parse(localStorage.getItem('dailyRelax') || '{}');
-      saved.reset = true;
-      localStorage.setItem('dailyRelax', JSON.stringify(saved));
-      initRelaxGame();
-    }
-
-    // ========== لعبة الألوان ==========
-    $$('.color-circle').forEach(circle => {
-      circle.onclick = () => {
-        const color = circle.dataset.color;
-        const message = COLOR_MESSAGES[color];
-        const lang = currentLang === 'ar' ? 'ar' : 'en';
-        
-        $('#colorMessage').innerHTML = `
-          <p class="text-white">${message[lang]}</p>
-        `;
-      };
-    });
-
-    // ========== التواصل ==========
-    function handleContact(e) {
-      e.preventDefault();
-      const name = $('#contactName').value.trim() || 'زائر';
-      const msg = $('#contactMsg').value.trim();
-      
-      if (!msg) return;
-      
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.push({
-        name,
-        msg,
-        date: new Date().toLocaleString('ar-SA')
-      });
-      localStorage.setItem('messages', JSON.stringify(messages));
-      
-      $('#contactName').value = '';
-      $('#contactMsg').value = '';
-      $('#contactSuccess').classList.remove('hidden');
-      
-      setTimeout(() => {
-        $('#contactSuccess').classList.add('hidden');
-      }, 3000);
-    }
-
-    function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      const container = $('#messagesList');
-      
-      if (messages.length === 0) {
-        container.innerHTML = `
-          <div class="text-center text-slate-400 py-8">
-            <div class="text-4xl mb-3">📭</div>
-            <p>لا توجد رسائل بعد</p>
-          </div>
-        `;
-        return;
-      }
-      
-      container.innerHTML = messages.map((m, i) => `
-        <div class="glass-card rounded-xl p-4">
-          <div class="flex justify-between items-start mb-2">
-            <span class="font-bold text-white">${m.name}</span>
-            <span class="text-xs text-slate-500">${m.date}</span>
-          </div>
-          <p class="text-slate-300 whitespace-pre-wrap">${m.msg}</p>
-        </div>
-      `).reverse().join('');
-    }
-
-    function clearMessages() {
-      if (confirm('هل أنت متأكد من مسح جميع الرسائل؟')) {
-        localStorage.removeItem('messages');
+        // تشغيل تحميل الرسائل عند بداية تحميل الصفحة
         loadMessages();
-      }
-    }
-
-    // ========== تسجيل دخول الأدمن ==========
-    const ADMIN_PASSWORD = 'admin123';
-
-    function handleAdminLogin(e) {
-      e.preventDefault();
-      const password = $('#adminPassword').value;
-      
-      if (password === ADMIN_PASSWORD) {
-        sessionStorage.setItem('adminLoggedIn', 'true');
-        showAdminPanel();
-        $('#adminPassword').value = '';
-      } else {
-        alert('❌ كلمة المرور خاطئة');
-      }
-    }
-
-    function showAdminPanel() {
-      $('#adminLogin').style.display = 'none';
-      $('#adminPanel').style.display = 'block';
-      loadMessages();
-    }
-
-    function hideAdminPanel() {
-      $('#adminLogin').style.display = 'block';
-      $('#adminPanel').style.display = 'none';
-    }
-
-    function handleAdminLogout() {
-      sessionStorage.removeItem('adminLoggedIn');
-      hideAdminPanel();
-    }
-
-    function checkAdminSession() {
-      if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-        showAdminPanel();
-      }
-    }
-
-    function showAdminSection() {
-      $('#admin').style.display = 'block';
-      closeMenu();
-      setTimeout(() => {
-        $('#admin').scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-
-    // ========== القائمة ==========
-    function toggleMenu() {
-      $('#mobileMenu').classList.toggle('open');
-    }
-
-    function closeMenu() {
-      $('#mobileMenu').classList.remove('open');
-    }
-
-    // إغلاق فوري عند النقر
-    $('#closeMenu').onclick = function() {
-      closeMenu();
-    };
-    
-    // تحسين استجابة القائمة
-    $$('#mobileMenu a, #mobileMenu button').forEach(el => {
-      el.addEventListener('click', () => {
-        closeMenu();
-      });
-      el.addEventListener('touchstart', () => {
-        closeMenu();
-      }, { passive: true });
-    });
-
-    // ========== كتم الصوت ==========
-    function toggleMute() {
-      isMuted = !isMuted;
-      const muteText = isMuted ? '🔇 الصوت' : '🔊 الصوت';
-      $('#muteBtn').textContent = muteText;
-      
-      if (audioContext) {
-        if (isMuted) {
-          audioContext.suspend();
-        } else {
-          audioContext.resume();
-        }
-      }
-    }
-
-    // ========== تغيير اللغة ==========
-    function toggleLanguage() {
-      currentLang = currentLang === 'ar' ? 'en' : 'ar';
-      $('#langBtn').textContent = currentLang === 'ar' ? 'EN' : 'AR';
-    }
-
-    // ========== التهيئة ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      createStars();
-      createClouds();
-      createRain();
-      scheduleLightning();
-      showQuote();
-      loadChat();
-      initMemoryGame();
-      initNumbersGame();
-      initWordsGame();
-      initRelaxGame();
-      loadMessages();
-      
-      // تشغيل الصوت مباشرة ومحاولة فك القفل عند أي تفاعل
-      initAudio();
-      ensureAudioStarted();
-      attachAudioUnlockListeners();
-      
-      // الأحداث
-      $('#chatForm').onsubmit = handleChat;
-      $('#clearChat').onclick = clearChat;
-      $('#speakQuote').onclick = speakQuote;
-      $('#newQuote').onclick = newQuote;
-      
-      // تمارين التنفس
-      $('#startBreath1').onclick = startBreathing1;
-      $('#stopBreath1').onclick = stopBreathing1;
-      $('#startBreath2').onclick = startBreathing2;
-      $('#stopBreath2').onclick = stopBreathing2;
-      
-      // تمارين أخرى
-      $('#startBodyScan').onclick = startBodyScan;
-      $('#stopBodyScan').onclick = stopBodyScan;
-      $('#startMuscle').onclick = startMuscle;
-      $('#stopMuscle').onclick = stopMuscle;
-      $('#startImagine').onclick = startImagine;
-      $('#stopImagine').onclick = stopImagine;
-      $('#startSleep').onclick = startSleepRoutine;
-      $('#stopSleep').onclick = stopSleepRoutine;
-      
-      // الألعاب
-      $('#resetMemory').onclick = initMemoryGame;
-      $('#resetNumbers').onclick = resetNumbers;
-      $('#resetWords').onclick = resetWords;
-      $('#startRelax').onclick = startRelax;
-      $('#resetRelax').onclick = resetRelax;
-      
-      // التواصل
-      $('#contactForm').onsubmit = handleContact;
-      $('#adminLoginForm').onsubmit = handleAdminLogin;
-      $('#clearMessages').onclick = clearMessages;
-      $('#adminLogout').onclick = handleAdminLogout;
-      
-      // القائمة والصوت واللغة
-      $('#menuBtn').onclick = toggleMenu;
-      $('#closeMenu').onclick = closeMenu;
-      $('#muteBtn').onclick = toggleMute;
-      $('#langBtn').onclick = toggleLanguage;
-      
-      // فحص جلسة الأدمن
-      checkAdminSession();
-      
-      // إغلاق القائمة عند النقر على رابط
-      $$('#mobileMenu a').forEach(a => a.onclick = closeMenu);
-      
-      // تهيئة الرسم
-      setTimeout(initCanvas, 100);
-      
-      // CSS للفقاعات
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes rise {
-          from { transform: translateY(0); }
-          to { transform: translateY(-250px); opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    });
-  </script>
+    </script>
 </body>
 </html>
