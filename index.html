@@ -150,8 +150,8 @@
     <!-- Clickable Backdrop to close panels -->
     <div id="panelBackdrop" class="backdrop" onclick="closeAllPanels()"></div>
     
-    <!-- Hidden YouTube Audio -->
-    <iframe id="bgMusic" class="hidden" width="0" height="0" src="https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A&controls=0" allow="autoplay; encrypted-media" frameborder="0" allowfullscreen></iframe>
+    <!-- Hidden YouTube Audio (set dynamically for daily/refresh rotation) -->
+    <iframe id="bgMusic" class="hidden" width="0" height="0" src="" allow="autoplay; encrypted-media" frameborder="0" allowfullscreen></iframe>
     
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/50 to-transparent p-4">
@@ -176,6 +176,9 @@
             <nav class="space-y-4">
                 <button onclick="openPanel('chat'); toggleMenu();" class="w-full text-right p-3 hover:bg-purple-600/20 rounded-xl flex items-center gap-3">
                     <span>💬</span> <span id="menuChat">المحادثة</span>
+                </button>
+                <button onclick="openPanel('messages'); toggleMenu();" class="w-full text-right p-3 hover:bg-purple-600/20 rounded-xl flex items-center gap-3">
+                    <span>✉️</span> <span id="menuMessages">الرسائل</span>
                 </button>
                 <button onclick="openPanel('games'); toggleMenu();" class="w-full text-right p-3 hover:bg-purple-600/20 rounded-xl flex items-center gap-3">
                     <span>🎮</span> <span id="menuGames">الألعاب</span>
@@ -393,14 +396,63 @@
         }
         createStars();
 
-        // Sound System
+        // Sound System (Daily + Refresh rotating YouTube background track)
         let soundEnabled = false;
+
+        const bgMusicPool = [
+            // Use long-form ambient/relax tracks (IDs only). Rotation happens daily + per refresh.
+            { id: '5qap5aO4i9A', titleAr: 'جلسة هادئة للاسترخاء', titleEn: 'Relaxing session' },
+            { id: 'eKFTSSKCzWA', titleAr: 'أصوات الطبيعة', titleEn: 'Nature sounds' },
+            { id: 'mPZkdNFkNps', titleAr: 'أصوات المطر', titleEn: 'Rain sounds' },
+            { id: '1ZYbU82GVz4', titleAr: 'موسيقى للنوم', titleEn: 'Sleep music' },
+            { id: 'DWcJFNfaw9c', titleAr: 'بيانو هادئ', titleEn: 'Soft piano' },
+            { id: '2OEL4P1Rz04', titleAr: 'أمواج البحر', titleEn: 'Ocean waves' },
+            { id: 'lE6RYpe9IT0', titleAr: 'ضوضاء بيضاء للنوم', titleEn: 'White noise for sleep' },
+            { id: 'q76bMs-NwRk', titleAr: 'تأمل واسترخاء', titleEn: 'Meditation & calm' }
+        ];
+
+        function getDayOfYear() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function buildBgMusicUrl(id) {
+            // Loop requires playlist param with the same video id
+            const base = `https://www.youtube.com/embed/${id}`;
+            const params = new URLSearchParams({
+                autoplay: '1',
+                loop: '1',
+                playlist: id,
+                controls: '0',
+                rel: '0',
+                modestbranding: '1',
+                playsinline: '1'
+            });
+            return `${base}?${params.toString()}`;
+        }
+
+        function pickBgTrackForThisLoad() {
+            const day = getDayOfYear();
+            const r = Math.floor(Math.random() * bgMusicPool.length);
+            const idx = (day + r) % bgMusicPool.length;
+            return bgMusicPool[idx];
+        }
+
+        // Chosen once per page load (refresh changes it)
+        let currentBgTrack = pickBgTrackForThisLoad();
+
+        function setBgMusicTrack(track) {
+            const iframe = document.getElementById('bgMusic');
+            iframe.src = track ? buildBgMusicUrl(track.id) : '';
+        }
+
         function enableSound() {
             if (!soundEnabled) {
                 soundEnabled = true;
                 document.getElementById('soundToggle').textContent = '🔊';
-                const iframe = document.getElementById('bgMusic');
-                iframe.src = "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A&controls=0";
+                setBgMusicTrack(currentBgTrack);
             }
         }
         document.addEventListener('click', enableSound, { once: true });
@@ -409,11 +461,10 @@
         document.getElementById('soundToggle').onclick = function() {
             soundEnabled = !soundEnabled;
             this.textContent = soundEnabled ? '🔊' : '🔇';
-            const iframe = document.getElementById('bgMusic');
             if (soundEnabled) {
-                iframe.src = "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A&controls=0";
+                setBgMusicTrack(currentBgTrack);
             } else {
-                iframe.src = "";
+                setBgMusicTrack(null);
             }
         };
 
@@ -1911,20 +1962,28 @@
             speechSynthesis.speak(utterance);
         };
 
-        // Music Section
+        // Music Section (rotates daily + per refresh)
         function loadMusic() {
-            const musicList = [
-                { title: currentLang === 'ar' ? 'موسيقى هادئة للاسترخاء' : 'Calm Relaxing Music', id: '5qap5aO4i9A' },
-                { title: currentLang === 'ar' ? 'أصوات الطبيعة' : 'Nature Sounds', id: 'eKFTSSKCzWA' },
-                { title: currentLang === 'ar' ? 'موسيقى للنوم' : 'Sleep Music', id: '1ZYbU82GVz4' },
-                { title: currentLang === 'ar' ? 'أصوات المطر' : 'Rain Sounds', id: 'mPZkdNFkNps' }
-            ];
-            
+            // Rotate the panel list too (refresh changes it, day affects the order)
+            const day = getDayOfYear();
+            const pool = [...bgMusicPool];
+
+            // Simple shuffle each load, but biased by day for daily variation
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = (Math.floor(Math.random() * (i + 1)) + day) % (i + 1);
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+
+            const musicList = pool.slice(0, 6).map(t => ({
+                title: currentLang === 'ar' ? t.titleAr : t.titleEn,
+                id: t.id
+            }));
+
             const container = document.getElementById('musicContent');
             container.innerHTML = musicList.map(m => `
                 <div class="bg-gradient-to-br from-blue-800/50 to-sky-900/50 rounded-2xl p-4">
                     <h4 class="font-bold mb-2">🎵 ${m.title}</h4>
-                    <iframe width="100%" height="200" src="https://www.youtube.com/embed/${m.id}?rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="rounded-lg"></iframe>
+                    <iframe width="100%" height="200" src="https://www.youtube.com/embed/${m.id}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="rounded-lg"></iframe>
                 </div>
             `).join('');
         }
