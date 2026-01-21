@@ -493,122 +493,659 @@
             ]
         };
 
-        // Advanced ChatGPT-like response system with memory and context
+        // Advanced ChatGPT-like response system (smarter, handles almost any message)
         let chatHistory = [];
-        const maxHistory = 10;
-        
+        const maxHistory = 30;
+
+        // Lightweight user profile (local, optional)
+        let userProfile = (() => {
+            try { return JSON.parse(localStorage.getItem('userProfile') || '{}') || {}; }
+            catch { return {}; }
+        })();
+        function saveUserProfile() {
+            try { localStorage.setItem('userProfile', JSON.stringify(userProfile)); } catch {}
+        }
+
+        // Persistent chat "state" (mood/topic) to make replies feel coherent across turns
+        let chatState = (() => {
+            try {
+                return JSON.parse(localStorage.getItem('chatState') || '{}') || {};
+            } catch {
+                return {};
+            }
+        })();
+        function saveChatState() {
+            try { localStorage.setItem('chatState', JSON.stringify(chatState)); } catch {}
+        }
+
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function detectLangFromText(text) {
+            const hasArabic = /[أ-ي]/.test(text);
+            const hasLatin = /[A-Za-z]/.test(text);
+            if (hasArabic && !hasLatin) return 'ar';
+            if (hasLatin && !hasArabic) return 'en';
+            // mixed: prefer current UI language
+            return currentLang === 'ar' ? 'ar' : 'en';
+        }
+
+        function normalizeForMatch(s) {
+            return (s || '')
+                .toLowerCase()
+                .replace(/[\u064B-\u0652]/g, '') // Arabic diacritics
+                .replace(/ـ/g, '')
+                .trim();
+        }
+
+        function arabicDigitsToLatin(str) {
+            return (str || '')
+                .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+                .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+        }
+
+        function safeEvalMath(expr) {
+            // Allow only digits, operators, parentheses, dot, spaces
+            const cleaned = arabicDigitsToLatin(expr)
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/')
+                .replace(/,/g, '.')
+                .trim();
+
+            if (!cleaned) return null;
+            if (!/^[0-9+\-*/().\s]+$/.test(cleaned)) return null;
+            // prevent weird sequences
+            if (/([+\-*/])\1{1,}/.test(cleaned)) return null;
+
+            try {
+                // eslint-disable-next-line no-new-func
+                const val = Function('"use strict"; return (' + cleaned + ')')();
+                if (typeof val !== 'number' || !isFinite(val)) return null;
+                return val;
+            } catch {
+                return null;
+            }
+        }
+
+        function pickQuoteForChat(lang) {
+            const quotes = lang === 'ar' ? quotesAr : quotesEn;
+            const q = quotes[Math.floor(Math.random() * quotes.length)];
+            return `"${q.text}" — ${q.author}`;
+        }
+
+        function updateState(partial) {
+            chatState = {
+                ...chatState,
+                ...partial,
+                // expire state if inactive for long
+                _ts: Date.now()
+            };
+            saveChatState();
+        }
+
+        function getState() {
+            const ts = chatState && chatState._ts ? chatState._ts : 0;
+            if (ts && (Date.now() - ts) > 1000 * 60 * 20) {
+                chatState = {};
+                saveChatState();
+            }
+            return chatState || {};
+        }
+
+        function detectIntentAndMood(raw, lang) {
+            const isArabic = lang === 'ar';
+            const text = normalizeForMatch(raw);
+
+            // Stronger sentence-level intent cues (not only keywords)
+            const intents = {
+                sleep: isArabic
+                    ? /(ما\s*اقدر\s*انام|مقدرت\s*انام|مب\s*قادر\s*انام|ما\s*جاني\s*نوم|ابي\s*انام|ابغى\s*انام|سهران|سهر|ار?ق|أرق|نومي\s*خربان|نوم\s*متقطع|قلق\s*قبل\s*النوم)/i.test(raw)
+                    : /(can't\s*sleep|cannot\s*sleep|insomnia|trouble\s*sleeping|sleep\s*is\s*bad|sleep\s*schedule|sleep\s*deprived)/i.test(raw),
+
+                exams: isArabic
+                    ? /(اختبار|امتحان|فاينل|نهائي|قدرات|تحصيلي|مذاكرة|مراجعة|واجب|مشروع|تسليم|درجات|مدرسة|جامعة)/i.test(raw)
+                    : /(exam|exams|test|finals|quiz|study|studying|homework|assignment|deadline|grades|school|college|university)/i.test(raw),
+
+                relationship: isArabic
+                    ? /(حبيب|حبيبي|حبيبتي|علاقتي|ارتباط|خطيب|خطوبة|زوجي|زوجتي|انفصال|فراق|خيانة|غيرة|مشاعر|حب)/i.test(raw)
+                    : /(boyfriend|girlfriend|partner|relationship|dating|breakup|cheating|jealous|feelings|love)/i.test(raw),
+
+                longing: isArabic
+                    ? /(اشتقت|شوق|وحشتني|وحشني|أفتقد|افتقد|حنيت|حنين)/i.test(raw)
+                    : /(miss\s+you|i\s*miss|longing|nostalgia|i\s*miss\s*them)/i.test(raw),
+
+                joke: isArabic
+                    ? /(نكتة|نكت|ضحكني|فلة|مزح)/i.test(raw)
+                    : /(joke|funny|make\s*me\s*laugh|lol|roast)/i.test(raw),
+
+                askAdvice: isArabic
+                    ? /(وش\s*اسوي|ايش\s*اسوي|كيف\s*اتصرف|وش\s*الحل|نصيحة|ساعدني)/i.test(raw)
+                    : /(what\s*should\s*i\s*do|how\s*do\s*i\s*deal|advice|help\s*me)/i.test(raw),
+
+                question: isArabic
+                    ? /\?|؟|ليش|لماذا|كيف|متى|وين|ايش|وش|هل\s+/i.test(raw)
+                    : /\?|\bhow\b|\bwhy\b|\bwhen\b|\bwhere\b|\bwhat\b|\bwho\b|\bcan\b\s+you|\bcould\b\s+you/i.test(text)
+            };
+
+            const moods = {
+                sad: isArabic
+                    ? /(حزين|زعلان|مكتئب|ضايق|مضايق|مهموم|مقهور|وحيد|وحده|تعبان\s*نفسيا|طفشان)/i.test(raw)
+                    : /(sad|depressed|down|upset|lonely|heartbroken|miserable)/i.test(text),
+
+                happy: isArabic
+                    ? /(مبسوط|فرحان|سعيد|متحمس|متفائل|فخور|انجاز|نجحت|ترقيه|نجاح)/i.test(raw)
+                    : /(happy|excited|great|awesome|proud|achievement|i\s*did\s*it|i\s*passed)/i.test(text),
+
+                anxious: isArabic
+                    ? /(قلقان|متوتر|متوتره|توتر|قلق|خايف|مرتبك|مضغوط|ضغط)/i.test(raw)
+                    : /(anxious|stressed|worried|nervous|overwhelmed|panic)/i.test(text),
+
+                romantic: isArabic
+                    ? /(احب|حبيت|اعشق|ولهان|مغرم|قلبي|غرام)/i.test(raw)
+                    : /(love|crush|in\s*love|romantic)/i.test(text)
+            };
+
+            const mood = moods.sad ? 'sad' : moods.happy ? 'happy' : moods.anxious ? 'anxious' : moods.romantic ? 'romantic' : null;
+            const topic = intents.sleep ? 'sleep' : intents.exams ? 'exams' : intents.relationship ? 'relationship' : intents.longing ? 'longing' : null;
+
+            return { intents, mood, topic };
+        }
+
         function getAIResponse(msg) {
-            const lowerMsg = msg.toLowerCase();
-            const isArabic = /[أ-ي]/.test(msg);
+            const lang = detectLangFromText(msg);
+            const isArabic = lang === 'ar';
+            const raw = (msg || '').trim();
+            const text = normalizeForMatch(raw);
             const patterns = isArabic ? chatPatterns.ar : chatPatterns.en;
-            
+
             // Store message in history
-            chatHistory.push({ role: 'user', content: msg, lang: isArabic ? 'ar' : 'en' });
+            chatHistory.push({ role: 'user', content: raw, lang });
             if (chatHistory.length > maxHistory) chatHistory.shift();
-            
-            // Check for greeting patterns first
-            for (let pattern of patterns) {
-                if (pattern.pattern.test(lowerMsg)) {
-                    chatHistory.push({ role: 'assistant', content: pattern.response, lang: isArabic ? 'ar' : 'en' });
-                    return pattern.response;
-                }
+
+            // --- Safety (self-harm) ---
+            const selfHarm = isArabic
+                ? /(انتحار|ابي\s*اموت|ودي\s*اموت|ما\s*ابي\s*اعيش|أذ[يى]\s*نفسي|اذ[يى]\s*نفسي|جرح\s*نفسي)/i
+                : /(suicide|kill\s*myself|end\s*my\s*life|self\s*-?harm|hurt\s*myself)/i;
+            if (selfHarm.test(raw)) {
+                const response = isArabic
+                    ? 'أسمعك… وصدقني ما أبيك تواجه هالإحساس لحالك. إذا فيه خطر عليك الآن أو تفكر تؤذي نفسك: اتصل بالطوارئ فوراً أو كلم شخص قريب منك الحين. لو تقدر، قل لي: أنت آمن/آمنة الآن؟ وهل فيه أحد تقدر تكلمه (أهل/صديق)؟'
+                    : 'I hear you. Please don\'t go through this alone. If you\'re in immediate danger or feel you might hurt yourself, call your local emergency number right now or reach out to someone you trust. Are you safe right now? Is there someone you can call (friend/family)?';
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
             }
-            
-            // Advanced contextual response based on conversation history
-            const lastUserMsg = lowerMsg;
-            const historyContext = chatHistory.slice(-4); // Last 4 messages for context
-            
+
+            // --- Remember name ---
             if (isArabic) {
-                // Analyze context for more personalized responses
-                if (lastUserMsg.includes('؟') || lastUserMsg.includes('كيف') || lastUserMsg.includes('لماذا') || lastUserMsg.includes('متى')) {
-                    const questionResponses = [
-                        'سؤال جميل! حسب خبرتي المتواضعة، الأمر يعتمد على نظرتك للحياة. إذا كنت تقصد...',
-                        'هذا سؤال عميق! في رأيي، الجواب مرتبط بقناعاتك الشخصية وقيمك.',
-                        'أعتقد أن الإجابة تختلف من شخص لآخر. بالنسبة لي، أرى أن...',
-                        'سأجيبك من تجربتي البسيطة: الحياة تعطينا الدروس المناسبة في الوقت المناسب.',
-                        'دعني أفكر معك في هذا السؤال المهم. ربما الجواب يكمن في...'
-                    ];
-                    const response = questionResponses[Math.floor(Math.random() * questionResponses.length)];
-                    chatHistory.push({ role: 'assistant', content: response, lang: 'ar' });
+                const m = raw.match(/^(اسمي|أنا اسمي|انا اسمي)\s+([\p{L}A-Za-z0-9_\-]{2,20})/u);
+                if (m) {
+                    userProfile.name = m[2];
+                    saveUserProfile();
+                    const response = `تشرفت يا ${userProfile.name}! 🤍 تبغاني أناديك بهذا الاسم دايم؟`;
+                    chatHistory.push({ role: 'assistant', content: response, lang });
                     return response;
                 }
-                
-                // Emotional support responses
-                if (lastUserMsg.includes('حزن') || lastUserMsg.includes('قلق') || lastUserMsg.includes('تعب') || lastUserMsg.includes('ضيق')) {
-                    const supportResponses = [
-                        'أشعر بك حقاً. الأوقات الصعبة تمر، وربما هذه التجربة ستقويك أكثر مما تتخيل. تريد تحكي لي أكثر؟',
-                        'لا تتحمل هموم الدنيا كلها وحدك. أنا هنا أسمعك، وكثير من التجارب التي نمر بيها تكون بوابة لتغير إيجابي.',
-                        'خذ نفساً عميقاً. الشعور هذا طبيعي ومؤقت. جرب تكتب مشاعرك على ورقة، أو خذ قسطاً من الراحة.',
-                        'كل إنسان يمر بفترات صعبة، وهذا لا يعني أنك ضعيف. العكس، اعترافك بالمشاعر يدل على قوة شخصيتك.',
-                        'الضيق الذي تشعر به الآن هو مؤقت. حاول تركز على الأشياء الصغيرة التي تجلب لك السعادة، حتى لو كانت بسيطة.'
-                    ];
-                    const response = supportResponses[Math.floor(Math.random() * supportResponses.length)];
-                    chatHistory.push({ role: 'assistant', content: response, lang: 'ar' });
-                    return response;
-                }
-                
-                // General conversational responses
-                const contextualAr = [
-                    'أتفهم تماماً ما تقصد. هل تريد أن نتحدث أكثر عن هذا الموضوع؟ أحب أسمع وجهة نظرك.',
-                    'رأيك مهم بالنسبة لي. دعني أفكر في كلامك وأعطيك رداً يكون مفيداً لك.',
-                    'كل محادثة معك تعلّمني شيء جديد. شكراً لأنك تشاركني أفكارك. تريد نكمل النقاش؟',
-                    'أعجبني أسلوبك في التعبير! هل عندك تجارب شخصية مرتبطة بهذا الموضوع؟',
-                    'الحوار معك ممتع جداً. أنا هنا لا فقط لأرد، بل لأتعلم منك أيضاً.',
-                    'كلامك يفتح آفاقاً جديدة للنقاش. لو تريد، ممكن نتعمق أكثر في هذا الموضوع؟',
-                    'أشعر أن بيننا تفاهم جميل. هل هناك شيء محدد تبغى تحكيه أو تسأل عنه؟',
-                    'كل مرة تحكي فيها، أتعرف على شخصيتك الرائعة أكثر. شكراً لثقتك بي.',
-                    'النقاش معك يشعرني بالدفء. تريد نغير الموضوع أو نكمل في نفس الاتجاه؟',
-                    'أنا مستمع جيد، وعندي وقت لكل ما تريد قوله. خذ راحتك وحكيلي كل شيء.'
-                ];
-                const response = contextualAr[Math.floor(Math.random() * contextualAr.length)];
-                chatHistory.push({ role: 'assistant', content: response, lang: 'ar' });
-                return response;
             } else {
-                // English responses
-                if (lastUserMsg.includes('?') || lastUserMsg.includes('how') || lastUserMsg.includes('why') || lastUserMsg.includes('when') || lastUserMsg.includes('what')) {
-                    const questionResponses = [
-                        'That\'s an interesting question! From my perspective, it really depends on how you look at life. If you mean...',
-                        'Deep question! In my opinion, the answer is connected to your personal beliefs and values.',
-                        'I think the answer varies from person to person. For me, I see that...',
-                        'Let me answer from my simple experience: life gives us the right lessons at the right time.',
-                        'Let me think about this important question with you. Perhaps the answer lies in...'
-                    ];
-                    const response = questionResponses[Math.floor(Math.random() * questionResponses.length)];
-                    chatHistory.push({ role: 'assistant', content: response, lang: 'en' });
+                const m = raw.match(/^(my name is|i\s*am|i'm)\s+([A-Za-z][A-Za-z\-']{1,20})/i);
+                if (m) {
+                    userProfile.name = m[2];
+                    saveUserProfile();
+                    const response = `Nice to meet you, ${userProfile.name}! 🤍 Want me to call you that from now on?`;
+                    chatHistory.push({ role: 'assistant', content: response, lang });
                     return response;
                 }
-                
-                // Emotional support in English
-                if (lastUserMsg.includes('sad') || lastUserMsg.includes('anxious') || lastUserMsg.includes('tired') || lastUserMsg.includes('stressed') || lastUserMsg.includes('worried')) {
-                    const supportResponses = [
-                        'I truly feel you. Difficult times pass, and perhaps this experience will strengthen you more than you imagine. Want to tell me more?',
-                        'Don\'t carry all the burdens of the world alone. I\'m here to listen, and many experiences we go through become gateways to positive change.',
-                        'Take a deep breath. This feeling is natural and temporary. Try writing your feelings on paper, or take some rest.',
-                        'Every person goes through difficult periods, and that doesn\'t mean you\'re weak. On the contrary, acknowledging your feelings shows strength of character.',
-                        'The distress you feel now is temporary. Try to focus on the small things that bring you happiness, even if they\'re simple.'
-                    ];
-                    const response = supportResponses[Math.floor(Math.random() * supportResponses.length)];
-                    chatHistory.push({ role: 'assistant', content: response, lang: 'en' });
+            }
+
+            // --- Quick patterns (greetings, thanks, etc.) ---
+            for (let p of patterns) {
+                if (p.pattern.test(raw)) {
+                    const base = p.response;
+                    const extra = isArabic
+                        ? getRandom([
+                            ' وش ودّك نسوي الحين؟',
+                            ' احك لي أكثر—أنا سامعك.',
+                            ' تبيني أسألك كم سؤال بسيط عشان أفهمك؟',
+                            ' تبي نخففها بنكتة ولا تفضفض؟',
+                            ''
+                        ])
+                        : getRandom([
+                            ' What would you like to do next?',
+                            ' Tell me more—I\'m listening.',
+                            ' Want me to ask a couple of questions so I understand better?',
+                            ' Joke or a deep talk?',
+                            ''
+                        ]);
+                    const response = base + extra;
+                    chatHistory.push({ role: 'assistant', content: response, lang });
                     return response;
                 }
-                
-                // General conversational responses in English
-                const contextualEn = [
-                    'I completely understand what you mean. Would you like to talk more about this topic? I\'d love to hear your perspective.',
-                    'Your opinion is important to me. Let me think about what you said and give you a response that might be helpful.',
-                    'Every conversation with you teaches me something new. Thank you for sharing your thoughts with me. Want to continue the discussion?',
-                    'I like your way of expressing yourself! Do you have personal experiences related to this topic?',
-                    'Dialogue with you is very enjoyable. I\'m here not just to respond, but to learn from you too.',
-                    'Your words open new horizons for discussion. If you want, we could delve deeper into this topic?',
-                    'I feel there\'s a beautiful understanding between us. Is there something specific you want to talk about or ask?',
-                    'Every time you speak, I get to know your wonderful personality more. Thank you for trusting me.',
-                    'Discussing with you feels warm. Do you want to change the subject or continue in the same direction?',
-                    'I\'m a good listener, and I have time for everything you want to say. Take your time and tell me everything.'
-                ];
-                const response = contextualEn[Math.floor(Math.random() * contextualEn.length)];
-                chatHistory.push({ role: 'assistant', content: response, lang: 'en' });
+            }
+
+            // --- Math / quick calculations ---
+            const mathVal = safeEvalMath(raw);
+            if (mathVal !== null && /[0-9٠-٩]/.test(raw) && /[+\-*/×÷]/.test(raw)) {
+                const response = isArabic
+                    ? `النتيجة: ${mathVal}`
+                    : `Result: ${mathVal}`;
+                chatHistory.push({ role: 'assistant', content: response, lang });
                 return response;
             }
+
+            // --- Intent detection ---
+            const wantsJoke = isArabic
+                ? /(نكتة|نكت|ضحكني|فكاهي|مزح)/.test(text)
+                : /(joke|funny|make me laugh|lol|roast me)/.test(text);
+
+            const wantsPoem = isArabic
+                ? /(قصيده|قصيدة|شعر|ابيات|أبيات)/.test(text) && /(اكتب|سو[يى]|ابغى|ودي|اعطني)/.test(text)
+                : /(poem|poetry)/.test(text) && /(write|make|give me)/.test(text);
+
+            const wantsStory = isArabic
+                ? /(قصة|قصه|حكاية)/.test(text) && /(اكتب|سو[يى]|ابغى|ودي|اعطني)/.test(text)
+                : /(story|tale)/.test(text) && /(write|make|tell me)/.test(text);
+
+            const wantsAdvice = isArabic
+                ? /(نصيحة|ساعدني|وش\s*اسوي|ايش\s*اسوي|كيف\s*اتصرف|وش\s*الحل|حل)/.test(text)
+                : /(advice|help me|what should i do|how do i deal|solution)/.test(text);
+
+            const wantsIdeas = isArabic
+                ? /(افكار|أفكار|اقتراحات|اقترح|فكرة)/.test(text)
+                : /(ideas|suggest|recommend|brainstorm)/.test(text);
+
+            const wantsExplain = isArabic
+                ? /(اشرح|فسر|وش\s*يعني|ايش\s*يعني|ما\s*هو|ماهي|معنى)/.test(text)
+                : /(explain|what is|define|meaning of)/.test(text);
+
+            const wantsSummary = isArabic
+                ? /(لخص|تلخيص|اختصر)/.test(text)
+                : /(summarize|summary|tl;dr|shorten)/.test(text);
+
+            const wantsCode = /(كود|برمجة|javascript|js|html|css|python|بايثون|جافاسكربت)/i.test(raw);
+
+            const isQuestion = isArabic
+                ? /\?|؟|ليش|لماذا|كيف|متى|وين|ايش|وش|هل\s+/.test(raw)
+                : /\?|how|why|when|where|what|who|can you|could you|should i/.test(text);
+
+            // --- Jokes ---
+            const jokesAr = [
+                'مرة واحد قال لصاحبه: أنا عندي ذاكرة قوية… الثاني قال: طيب متى؟ قال: مدري نسيت 😂',
+                'واحد فتح الثلاجة وهو زعلان… لقاه نفس الزعل بس أبرد 😅',
+                'قالوا لي لا تعصب… قلت حاضر، بس علّمني كيف وأنا متعصب؟ 😂',
+                'مرة واحد يبي ينام بدري… جلس يفكر ليه الناس تنام بدري… وما نام 😂',
+                'أقوى إنجاز يوم تقفل الجوال عشان تنام… وتفتحـه بس عشان تتأكد إنه مقفّل 😅'
+            ];
+            const jokesEn = [
+                "Why did the scarecrow win an award? Because he was outstanding in his field.",
+                "I told my computer I needed a break… now it won't stop sending me KitKat ads.",
+                "Parallel lines have so much in common. It's a shame they'll never meet.",
+                "I used to play piano by ear, now I use my hands.",
+                "Why don't programmers like nature? Too many bugs."
+            ];
+            if (wantsJoke) {
+                const response = isArabic ? getRandom(jokesAr) : getRandom(jokesEn);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Sentence-level mood/topic detection + persistent state ---
+            const s = getState();
+            const analysis = detectIntentAndMood(raw, lang);
+
+            if (analysis.mood && analysis.mood !== s.mood) updateState({ mood: analysis.mood });
+            if (analysis.topic && analysis.topic !== s.topic) updateState({ topic: analysis.topic });
+
+            const state = getState();
+
+            const name = userProfile.name ? (isArabic ? ` يا ${userProfile.name}` : `, ${userProfile.name}`) : '';
+
+            // Topic: Sleep (practical calming tips)
+            if (analysis.topic === 'sleep' || state.topic === 'sleep') {
+                updateState({ topic: 'sleep' });
+
+                const sleepTipsAr = [
+                    'تمام… خلّنا نهدّي الجو شوي. أول شيء: لا تشرب موية كثير قبل النوم بساعة عشان ما تقطع نومك.',
+                    'جرب تخفف الإضاءة وتبعد الجوال 30 دقيقة قبل ما تنام—الضوء الأزرق يلخبط المخ.',
+                    'إذا تفكيرك شغال: اكتب اللي في بالك بورقة دقيقة وحدة وبعدين ارميها/اقفلها. يخف الضغط.',
+                    'جرّب تنفّس: 4 ثواني شهيق… 4 حبس… 6 زفير. كرر 3 مرات.',
+                    'وش رأيك تشغل موسيقى هادئة خفيفة وتخلي الصوت منخفض؟'
+                ];
+                const sleepTipsEn = [
+                    'Let’s calm things down. Try avoiding large amounts of water in the last hour so you don’t wake up often.',
+                    'Dim the lights and put your phone away for 30 minutes—blue light can mess with sleep.',
+                    'If your mind is racing: write your thoughts for 1 minute, then close it. It helps unload your brain.',
+                    'Try breathing: inhale 4… hold 4… exhale 6. Repeat 3 times.',
+                    'Want to play gentle background music at low volume?'
+                ];
+
+                const followUpAr = getRandom([
+                    'بس قل لي: المشكلة إنك ما تنام من الأساس، ولا تصحى كثير؟',
+                    'من متى والموضوع معك؟ اليومين هذي ولا من زمان؟',
+                    'تبغى حل سريع الليلة، ولا نبني روتين يضبط نومك؟'
+                ]);
+                const followUpEn = getRandom([
+                    'Tell me: is it trouble falling asleep, or waking up too much?',
+                    'How long has this been going on—days or weeks?',
+                    'Do you want a quick fix for tonight, or a routine that fixes it long-term?'
+                ]);
+
+                const response = (isArabic ? getRandom(sleepTipsAr) + ' ' + followUpAr : getRandom(sleepTipsEn) + ' ' + followUpEn);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // Topic: Exams / studying
+            if (analysis.topic === 'exams' || state.topic === 'exams') {
+                updateState({ topic: 'exams' });
+
+                const examsAr = [
+                    'قدّامك اختبار؟ تمام… خلّنا نرتبها بدون ضغط. قسم مذاكرتك لدفعات 25 دقيقة + 5 راحة (مرتين أو ثلاث).',
+                    'إذا التوتر عالي: قبل المذاكرة خذ دقيقتين تنفّس، وبعدها ابدأ بأسهل جزء عشان تدخل مود.',
+                    'أفضل شيء: بدل ما تقرأ كثير، جرّب تسوي أسئلة لنفسك وتجاوب—التذكر يصير أسرع.',
+                    'إذا الوقت ضيق: ركّز على أهم 20% من المواضيع اللي تجيب 80% من الدرجة.'
+                ];
+                const examsEn = [
+                    'Got exams? Let’s make it manageable: 25 minutes focus + 5 minutes break (2–3 rounds).',
+                    'If anxiety is high: do 2 minutes of breathing first, then start with the easiest part to build momentum.',
+                    'Instead of rereading, quiz yourself—active recall works faster.',
+                    'If time is tight: focus on the 20% that gives you 80% of the score.'
+                ];
+
+                const followUpAr = getRandom([
+                    'وش المادة؟ وكم باقي على الاختبار؟',
+                    'أكثر شي يخوفك: الوقت ولا صعوبة المنهج؟',
+                    'تبغى خطة اليوم (بالساعات)؟'
+                ]);
+                const followUpEn = getRandom([
+                    'Which subject, and how many days left?',
+                    'What’s the hardest part for you: time or difficulty?',
+                    'Want a simple hour-by-hour plan for today?'
+                ]);
+
+                const response = (isArabic ? getRandom(examsAr) + ' ' + followUpAr : getRandom(examsEn) + ' ' + followUpEn);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // Topic: Relationship / lover
+            if (analysis.topic === 'relationship' || state.topic === 'relationship') {
+                updateState({ topic: 'relationship' });
+
+                const relAr = [
+                    `أحس موضوعه/موضوعها مأثر عليك${name}. خلّني أفهم: اللي تحسه الحين أقرب لـ (حب/تعلّق/خوف من الفقد)؟`,
+                    `طيب خلّنا نكون صريحين${name}: إيش أكثر شي تبغاه يصير بينكم؟ وضوح؟ قرب؟ ولا اعتذار؟`,
+                    `إذا ودّك${name}… احكي لي آخر موقف خلاك تفكر فيه/فيها كثير. وش صار بالضبط؟`,
+                    `أحياناً المشاعر تكون رسالة. هل العلاقة تعطيك أمان… ولا تستنزفك؟`
+                ];
+                const relEn = [
+                    `I can tell this matters to you${name}. Is what you feel closer to love, attachment, or fear of losing them?`,
+                    `Let’s be honest${name}: what do you want to happen between you two—clarity, closeness, or an apology?`,
+                    `If you want${name}, tell me the last situation that made you think about them a lot—what happened?`,
+                    `Sometimes feelings are a message. Does the relationship make you feel safe—or drained?`
+                ];
+
+                const response = isArabic ? getRandom(relAr) : getRandom(relEn);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // Topic: Longing / missing someone (short comforting mini-story or thought)
+            if (analysis.topic === 'longing' || state.topic === 'longing') {
+                updateState({ topic: 'longing' });
+
+                const miniAr = [
+                    'الشوق يجي كأنه موج… يرفعك شوي وبعدين يهدّي. تخيل إن شعورك رسالة تقول: "كان فيه شي جميل"—مو لازم تعاقب نفسك عليه.',
+                    'أحياناً الشوق مو للشخص قد ما هو للنسخة اللي كنتها وقتها. وذا طبيعي… بس مو معناه إنك واقف مكانك.',
+                    'ودي أعطيك حكاية قصيرة: تخيّل قلبك كغرفة فيها ضوء خفيف… كل ما اشتقت، افتح النافذة شوي يدخل هوا—وبعدين اقفلها بهدوء. الشوق ما يحتاج حرب، يحتاج تنظيم.'
+                ];
+                const miniEn = [
+                    'Missing someone comes like a wave—up, then softer. It’s your heart saying: “something mattered.” You don’t have to punish yourself for that.',
+                    'Sometimes you miss not only the person, but who you were back then. That’s normal—and it doesn’t mean you’re stuck.',
+                    'A tiny story: imagine your heart as a room with dim light. When longing arrives, open the window for a moment—let air in—then close it gently. No battle needed, just care.'
+                ];
+
+                const followUpAr = getRandom([
+                    'تبغى تكلمه/تكلمها ولا بس تتمنى؟',
+                    'الشوق هذا يجيك بالليل أكثر ولا طول اليوم؟',
+                    'وش أكثر شي تفتقده: كلامه/كلامها ولا وجوده/وجودها؟'
+                ]);
+                const followUpEn = getRandom([
+                    'Do you want to reach out, or is it just longing?',
+                    'Does it hit harder at night or throughout the day?',
+                    'What do you miss most: their words, or their presence?'
+                ]);
+
+                const response = (isArabic ? getRandom(miniAr) + ' ' + followUpAr : getRandom(miniEn) + ' ' + followUpEn);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Emotional intelligence (expanded) with sustained mood ---
+            const ar = {
+                sad: ['حزين','زعلان','مكتئب','ضايق','ضيق','هم','حزن','منضغط','مكسور','تعبان نفسياً','طفشان'],
+                happy: ['فرحان','سعيد','مبسوط','متفائل','رهيب','متحمس','فخور','انجاز'],
+                stress: ['متوتر','قلقان','قلق','خايف','مرتبك','مضغوط','توتر'],
+                anger: ['معصب','زعلان من','مقهور','منرفز','مستفز'],
+                love: ['احب','حب','اعشق','مغرم','ولهان']
+            };
+            const en = {
+                sad: ['sad','down','depressed','unhappy','broken','upset','lonely'],
+                happy: ['happy','excited','great','amazing','awesome','proud','achievement'],
+                stress: ['anxious','stressed','worried','nervous','overwhelmed'],
+                anger: ['angry','furious','mad','annoyed','pissed'],
+                love: ['love','crush','in love','miss them']
+            };
+            const containsAny = (words) => words.some(w => text.includes(w));
+
+            if (isArabic && containsAny(ar.sad) || (!isArabic && containsAny(en.sad))) {
+                const response = isArabic
+                    ? getRandom([
+                        'يا قلبي… واضح إن الموضوع ثقيل عليك. تبغاني أسمعك بس، ولا نشتغل سوا على حل خطوة خطوة؟',
+                        'أحس فيك. قل لي: وش أكثر شي يوجعك في الموضوع؟ نبدأ منه.',
+                        'عادي تتعب—مو لازم تكون قوي طول الوقت. وش اللي صار معك اليوم؟'
+                    ])
+                    : getRandom([
+                        'I\'m really sorry you\'re feeling this. Do you want me to just listen, or help you work through it step by step?',
+                        'That sounds heavy. What part hurts the most right now?',
+                        'It\'s okay to feel this way. What happened today?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (isArabic && containsAny(ar.happy) || (!isArabic && containsAny(en.happy))) {
+                const name = userProfile.name ? (isArabic ? ` يا ${userProfile.name}` : `, ${userProfile.name}`) : '';
+                const response = isArabic
+                    ? getRandom([
+                        `يا سلام${name}! فرحت لك. علّمني وش صار؟`,
+                        `هذا اللي نبيّه${name}! تبيني أشاركك فرحتك بنكتة ولا تهنئة قوية؟`,
+                        `الله يديمها${name}! وش الشي اللي تبغى تسويه بعد هالخبر؟`
+                    ])
+                    : getRandom([
+                        `That\'s awesome${name}! Tell me what happened!`,
+                        `I\'m genuinely happy for you${name}. Want a celebratory joke or a hype message?`,
+                        `Love that for you${name}. What do you want to do next?`
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (isArabic && containsAny(ar.stress) || (!isArabic && containsAny(en.stress))) {
+                const response = isArabic
+                    ? getRandom([
+                        'تعال نخففها شوي: خذ نفس 4 ثواني… حبسه 4… وطلعه 6. كرر مرتين وبعدين قل لي وش اللي يقلقك.',
+                        'خلنا نفصلها: وش الشي اللي تقدر تتحكم فيه اليوم؟ ووش الشي اللي خارج يدك؟',
+                        'إذا ودك… افتح تبويب تمارين الاسترخاء، وبعدها نرجع نكمل كلامنا.'
+                    ])
+                    : getRandom([
+                        'Let\'s soften it: inhale 4… hold 4… exhale 6. Do it twice, then tell me what\'s worrying you most.',
+                        'Let\'s split it: what\'s in your control today, and what\'s outside your control?',
+                        'If you want, open the relaxation exercises tab for a minute, then come back and we\'ll continue.'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (isArabic && containsAny(ar.anger) || (!isArabic && containsAny(en.anger))) {
+                const response = isArabic
+                    ? getRandom([
+                        'أحس إنك منرفز… عطيني دقيقة: وش اللي استفزك بالضبط؟',
+                        'خلنا نهدّيها قبل ما نقرر أي رد. لو تبي، اكتب اللي ودك تقوله لهم هنا وأنا أرتبه لك بصيغة أهدى.',
+                        'طبيعي تعصب. تبغى حل عملي ولا بس تفضفض؟'
+                    ])
+                    : getRandom([
+                        'I can tell you\'re angry. What exactly triggered it?',
+                        'Before you respond, want to draft your message here and I\'ll help you make it calmer and clearer?',
+                        'Totally valid. Do you want a practical plan or just to vent?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (isArabic && containsAny(ar.love) || (!isArabic && containsAny(en.love))) {
+                const response = isArabic
+                    ? getRandom([
+                        'الحب يخبّص الترتيب كله 😅 قل لي: شعورك مريح ولا متعب؟',
+                        'ودي أفهم: الموضوع بينكم واضح ولا فيه تردد؟',
+                        'إذا تحب، احكي لي القصة من البداية—وش اللي شدّك؟'
+                    ])
+                    : getRandom([
+                        'Love can be messy 😅 Does it feel comforting or exhausting?',
+                        'Is it clear between you two, or is it complicated?',
+                        'If you want, tell me the story from the start—what pulled you in?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Writing / creativity ---
+            if (wantsPoem) {
+                const response = isArabic
+                    ? getRandom([
+                        'أكيد. قل لي: تبغى قصيدة (حزينة/غزل/تحفيز)؟ وكم بيت تقريباً؟',
+                        'تم! عطيني موضوع القصيدة وكلمتين تحب تدخلها فيها، وأنا أكتبها لك.',
+                        'أكتب لك أبيات حلوة—بس وش الجو؟ فصيح ولا عامي؟'
+                    ])
+                    : getRandom([
+                        'Sure—what vibe do you want (romantic, sad, motivational)? And how long?',
+                        'Done. Give me the theme and 2 words you want included, and I\'ll write it.',
+                        'Poem coming up—do you want it classic or modern style?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (wantsStory) {
+                const response = isArabic
+                    ? getRandom([
+                        'تمام! تبغى قصة قصيرة ولا طويلة؟ وخيال ولا واقعية؟',
+                        'أقدر أحكي لك قصة حماسية. عطيني: (بطل/مكان/شيء سحري) وأنا أبني لك حبكة قوية.',
+                        'قصة جاهزة… بس وش النوع: رعب خفيف، مغامرة، ولا رومانس؟'
+                    ])
+                    : getRandom([
+                        'Sure! Short or long? Fantasy or realistic?',
+                        'I can tell you an exciting story—give me: (hero / setting / magical item).',
+                        'What genre: cozy, adventure, mystery, or romance?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Summary / explain ---
+            if (wantsSummary) {
+                const response = isArabic
+                    ? 'أكيد. الصق النص اللي تبغى ألخصه هنا، وقل لي: تبغى تلخيص قصير جداً ولا متوسط ولا مفصل؟'
+                    : 'Sure. Paste the text you want summarized, and tell me: very short, medium, or detailed?';
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            if (wantsExplain) {
+                const response = isArabic
+                    ? 'تمام. اكتب المصطلح/الفكرة اللي تبغى شرحها (أو انسخ الجملة)، وقل لي: تبي شرح بسيط ولا عميق مع أمثلة؟'
+                    : 'Sure. Tell me the term/idea you want explained (or paste the sentence). Do you want a simple explanation or a deeper one with examples?';
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Coding help ---
+            if (wantsCode) {
+                const response = isArabic
+                    ? 'أكيد. قول لي: تبي كود بأي لغة (HTML/CSS/JS)؟ وايش تبي يسوي بالضبط؟ عطيني مثال بسيط على المخرجات اللي تتوقعها.'
+                    : 'Sure. Which language (HTML/CSS/JS/Python) and what exactly do you want it to do? Give me a small example of the expected output.';
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Advice / problem-solving ---
+            if (wantsAdvice) {
+                const response = isArabic
+                    ? getRandom([
+                        'أبشر. عشان أعطيك نصيحة دقيقة: وش صار بالضبط؟ ومن الأطراف؟ وإيش النتيجة اللي تبغاها بالنهاية؟',
+                        'تمام… خلنا نمشيها بهدوء. اكتب المشكلة بجملة وحدة، وبعدها نقسمها: (وش تقدر تسوي الآن / وش يحتاج وقت / وش لازم توقفه).',
+                        'أقدر أساعدك بخطة واضحة، بس أبي أعرف: الموضوع شخصي، دراسة، شغل، ولا علاقات؟'
+                    ])
+                    : getRandom([
+                        'I can help. To give you solid advice: what happened, who\'s involved, and what outcome do you want?',
+                        'Let\'s do it calmly. Describe the problem in one sentence, then we\'ll split it into: (what you can do now / what needs time / what to stop doing).',
+                        'I can make a clear plan—what area is it: personal, study, work, or relationships?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Ideas / brainstorming ---
+            if (wantsIdeas) {
+                const response = isArabic
+                    ? 'أكيد. أفكار لأي شيء بالضبط؟ (اسم مشروع/بوست/هدية/محتوى/تطبيق…). قل لي الجمهور والستايل اللي تحبه (هادئ/فخم/مضحك) وأنا أعطيك قائمة قوية.'
+                    : 'Sure. Ideas for what exactly (project name, post, gift, content, app…)? Tell me the audience and the vibe (cozy, premium, funny) and I\'ll brainstorm a strong list.';
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Quote request ---
+            if (isArabic ? /(اقتباس|اقتباسات|حكمة|حفزني)/.test(text) : /(quote|motivate|motivation)/.test(text)) {
+                const response = isArabic
+                    ? `تفضل 🤍 ${pickQuoteForChat('ar')}`
+                    : `Here you go 🤍 ${pickQuoteForChat('en')}`;
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- If it's a question (general) ---
+            if (isQuestion) {
+                const response = isArabic
+                    ? getRandom([
+                        'سؤال جميل. عطيني شوي تفاصيل زيادة (مثلاً: متى بدأ؟ وش جرّبت؟ وش تبغى توصل له؟) وبأجاوبك بشكل أوضح.',
+                        'خلني أفهم قصدك أكثر: تقصد من ناحية عملية ولا شعورية/نفسية؟',
+                        'أقدر أجاوبك، بس قبلها: إيش أهم شي تبيه من الإجابة—حل سريع ولا فهم أعمق؟'
+                    ])
+                    : getRandom([
+                        'Good question. Give me a bit more context (when did it start, what have you tried, what outcome do you want?) and I\'ll answer more clearly.',
+                        'Do you mean this practically, or emotionally/psychologically?',
+                        'What do you want most from the answer—quick fix or deeper understanding?'
+                    ]);
+                chatHistory.push({ role: 'assistant', content: response, lang });
+                return response;
+            }
+
+            // --- Fallback: always respond meaningfully ---
+            const last = chatHistory.slice(-4).filter(x => x.role === 'user').map(x => x.content).join(' / ');
+            const response = isArabic
+                ? getRandom([
+                    userProfile.name ? `تمام يا ${userProfile.name}… أحس إنك تقصد شي مهم. تبغى تشرحه لي بجملة زيادة؟` : 'تمام… أحس إنك تقصد شي مهم. تبغى تشرحه لي بجملة زيادة؟',
+                    'أنا معك. إذا تبغى نرتّب أفكارك: اكتب 3 نقاط (وش صار؟ وش تحس؟ وش تبغى يصير؟).',
+                    'وصلتني الرسالة. تبي رد لطيف يخفف الجو، ولا تبغى نتكلم بجدية ونحل؟',
+                    `إذا قصدك موضوع ثاني، قل لي وش هو بالضبط—أنا جاهز. (آخر اللي قلتَه: ${last})`
+                ])
+                : getRandom([
+                    userProfile.name ? `Got you, ${userProfile.name}. I feel there\'s something important here—can you add one more sentence?` : 'Got you. I feel there\'s something important here—can you add one more sentence?',
+                    'I\'m with you. If you want to organize your thoughts: write 3 lines (what happened / how you feel / what you want next).',
+                    'I hear you. Do you want a light, comforting reply—or a serious step-by-step approach?',
+                    `If you meant something else, tell me exactly what it is—I\'m ready. (Last thing you said: ${last})`
+                ]);
+
+            chatHistory.push({ role: 'assistant', content: response, lang });
+            return response;
         }
 
         function sendMessage() {
