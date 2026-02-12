@@ -1,36 +1,38 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-
-// ... (نفس التعريفات السابقة للـ Types والأسئلة دون تغيير)
+// ... (نفس الاستيرادات والتعريفات السابقة)
 
 export const App = () => {
   const [playerName, setPlayerName] = useState("");
   const [playerInput, setPlayerInput] = useState("");
-  const [current, setCurrent] = useState(0);
-  const [lives, setLives] = useState(5);
-  const [status, setStatus] = useState<"playing" | "won" | "lost">("playing");
+  // ... باقي الـ States ...
   
-  // الحالة المسؤولة عن تشغيل الموسيقى
+  // حالة التحكم في ظهور المشغل
   const [youtubeMusicStarted, setYoutubeMusicStarted] = useState(false);
 
-  // دالة بدء اللعبة والموسيقى
   const handleStart = () => {
     if (!playerInput.trim()) return;
     
-    // تفعيل الموسيقى عند أول تفاعل حقيقي (الضغط على الزر)
+    // 1. تفعيل الموسيقى (سيحدث الآن لأن المستخدم ضغط على الزر)
     setYoutubeMusicStarted(true);
     
+    // 2. حفظ الاسم وبدء اللعبة
     localStorage.setItem("player-name", playerInput.trim());
     setPlayerName(playerInput.trim());
+    
+    // إذا كنت تستخدم دالة playStart الصوتية:
+    // playStart(); 
   };
+
+  // معرف فيديو لموسيقى هادئة وحماسية (Lofi Gaming)
+  const videoId = "jfKfPfyJRdk"; 
 
   return (
     <div className="min-h-screen bg-animated-gradient text-white font-sans">
-      {/* واجهة اللعبة الأصلية */}
+      {/* واجهة اللعبة */}
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-10">
-        {/* ... (باقي كود الواجهة كما هو) */}
+        {/* محتوى الصفحة ... */}
       </div>
 
-      {/* شاشة الدخول */}
+      {/* شاشة الدخول (التي تفعل الموسيقى عند الضغط) */}
       {!playerName && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-6">
           <div className="w-full max-w-lg rounded-3xl border border-white/20 bg-slate-900 p-8 shadow-2xl text-center">
@@ -38,28 +40,29 @@ export const App = () => {
             <input 
               value={playerInput} 
               onChange={(e) => setPlayerInput(e.target.value)} 
-              placeholder="اكتب اسمك هنا..." 
-              className="w-full rounded-2xl bg-white/10 p-4 text-center mb-4 border border-white/20"
+              placeholder="اكتب اسمك للمنافسة..." 
+              className="w-full rounded-2xl bg-white/10 p-4 text-center text-white border border-white/20 focus:outline-none mb-6"
             />
             <button 
               onClick={handleStart} 
-              className="w-full rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 p-4 font-bold text-slate-900"
+              className="w-full rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 p-4 font-bold text-slate-900 text-xl shadow-xl hover:scale-105 transition-transform"
             >
-              🚀 ابدأ اللعب والموسيقى
+              🚀 ابدأ اللعب
             </button>
           </div>
         </div>
       )}
 
-      {/* مشغل يوتيوب المخفي - تم تحديث الرابط ليعمل على المواقع المرفوعة */}
+      {/* مشغل يوتيوب المخفي - تم تصحيح الرابط ليعمل على المتصفحات */}
       {youtubeMusicStarted && (
-        <div style={{ position: 'fixed', top: '-1000px', left: '-1000px', opacity: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: '-1000px', left: '-1000px', width: '1px', height: '1px', overflow: 'hidden' }}>
           <iframe
             width="100"
             height="100"
-            src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk&mute=0"
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&mute=0`}
             title="Background Music"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            style={{ border: 'none' }}
           ></iframe>
         </div>
       )}
