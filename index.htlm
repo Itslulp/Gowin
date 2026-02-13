@@ -1,71 +1,210 @@
-// ... (نفس الاستيرادات والتعريفات السابقة)
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+
+// --- التعريفات والأنواع (Types) ---
+type Question = {
+  emoji: string;
+  question: string;
+  options: string[];
+  answer: string;
+};
+
+type LeaderboardEntry = {
+  name: string;
+  time: number;
+  lives: number;
+  timestamp: number;
+};
+
+type GoatRecord = {
+  name: string;
+  time: number;
+  lives: number;
+  timestamp: number;
+};
+
+type Match = {
+  player1: string;
+  player2: string;
+  winner?: string;
+  player1Lives?: number;
+  player2Lives?: number;
+  player1Time?: number;
+  player2Time?: number;
+};
+
+type TournamentRound = {
+  roundNumber: number;
+  matches: Match[];
+  questions: Question[];
+};
+
+type MultiplayerRoom = {
+  roomId: string;
+  mode: "cooperative" | "versus";
+  player1: string;
+  player2?: string;
+  player1Ready: boolean;
+  player2Ready: boolean;
+  status: "waiting" | "playing" | "finished";
+};
+
+// --- الأسئلة ---
+const allQuestionsAr: Question[][] = [
+  [
+    { emoji: "🌍", question: "ما هي عاصمة فرنسا؟", options: ["باريس", "مدريد", "روما", "برلين"], answer: "باريس" },
+    { emoji: "🧮", question: "كم الناتج؟ 12 × 8", options: ["92", "96", "88", "108"], answer: "96" },
+    { emoji: "🪐", question: "أكبر كوكب في المجموعة الشمسية؟", options: ["الأرض", "المشتري", "المريخ", "زحل"], answer: "المشتري" },
+    { emoji: "💻", question: "مؤسس شركة مايكروسوفت؟", options: ["ستيف جوبز", "إيلون ماسك", "بيل غيتس", "مارك زوكربيرغ"], answer: "بيل غيتس" },
+  ],
+];
+
+const TOTAL_LIVES = 5;
 
 export const App = () => {
   const [playerName, setPlayerName] = useState("");
   const [playerInput, setPlayerInput] = useState("");
-  // ... باقي الـ States ...
+  const [current, setCurrent] = useState(0);
+  const [lives, setLives] = useState(TOTAL_LIVES);
+  const [shake, setShake] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [status, setStatus] = useState<"playing" | "won" | "lost">("playing");
+  const [language, setLanguage] = useState<"ar" | "en">("ar");
   
-  // حالة التحكم في ظهور المشغل
-  const [youtubeMusicStarted, setYoutubeMusicStarted] = useState(false);
+  // --- مشغل الموسيقى الخلفية (MP3 خارجي) ---
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const startBackgroundMusic = () => {
+    if (!audioRef.current) {
+      // تم اختيار رابط موسيقى MP3 مباشر وحماسي
+      audioRef.current = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3");
+      audioRef.current.loop = true; // تكرار الموسيقى
+      audioRef.current.volume = 0.3; // مستوى الصوت (هادئ في الخلفية)
+    }
+    audioRef.current.play().catch(err => console.log("خطأ في تشغيل الصوت:", err));
+  };
 
   const handleStart = () => {
     if (!playerInput.trim()) return;
     
-    // 1. تفعيل الموسيقى (سيحدث الآن لأن المستخدم ضغط على الزر)
-    setYoutubeMusicStarted(true);
+    // تشغيل الموسيقى فور التفاعل مع الزر
+    startBackgroundMusic();
     
-    // 2. حفظ الاسم وبدء اللعبة
-    localStorage.setItem("player-name", playerInput.trim());
     setPlayerName(playerInput.trim());
-    
-    // إذا كنت تستخدم دالة playStart الصوتية:
-    // playStart(); 
+    localStorage.setItem("player-name", playerInput.trim());
   };
 
-  // معرف فيديو لموسيقى هادئة وحماسية (Lofi Gaming)
-  const videoId = "jfKfPfyJRdk"; 
+  useEffect(() => {
+    let timer: number;
+    if (playerName && status === "playing") {
+      timer = window.setInterval(() => setElapsed(prev => prev + 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [playerName, status]);
+
+  const questions = allQuestionsAr[0];
+  const question = questions[current];
+  const progress = ((current + 1) / questions.length) * 100;
+
+  const handleAnswer = (option: string) => {
+    if (status !== "playing") return;
+    if (option === question.answer) {
+      if (current === questions.length - 1) {
+        setStatus("won");
+      } else {
+        setCurrent(prev => prev + 1);
+      }
+    } else {
+      setShake(true);
+      setLives(prev => {
+        const newLives = prev - 1;
+        if (newLives <= 0) setStatus("lost");
+        return newLives;
+      });
+      setTimeout(() => setShake(false), 500);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-animated-gradient text-white font-sans">
-      {/* واجهة اللعبة */}
+    <div className="min-h-screen bg-animated-gradient text-white font-sans selection:bg-cyan-500/30">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-10">
-        {/* محتوى الصفحة ... */}
+        
+        {/* الهيدر */}
+        <header className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-yellow-200 to-orange-400 bg-clip-text text-transparent">
+            دوري أبطال Gowin
+          </h1>
+          <div className="flex gap-6">
+            <div className="text-right">
+              <p className="text-sm text-white/70">الوقت</p>
+              <p className="text-2xl font-bold">{elapsed}s</p>
+            </div>
+            <div>
+              <p className="text-sm text-white/70">الحيوات</p>
+              <div className="flex gap-1">
+                {Array.from({ length: TOTAL_LIVES }).map((_, i) => (
+                  <span key={i} className={i < lives ? "text-xl" : "text-xl opacity-20"}>❤️</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <section className={`relative rounded-3xl border border-white/15 bg-white/10 p-8 shadow-xl backdrop-blur transition-all ${shake ? "card-shake" : ""}`}>
+            {status === "playing" ? (
+              <>
+                <div className="mb-6 h-2 w-full rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
+                </div>
+                <h2 className="text-3xl font-bold mb-8">{question.emoji} {question.question}</h2>
+                <div className="grid gap-4">
+                  {question.options.map(opt => (
+                    <button key={opt} onClick={() => handleAnswer(opt)} className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-right text-lg transition hover:bg-white/20 hover:scale-[1.02]">
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="py-20 text-center">
+                <h2 className="text-4xl font-black mb-4">{status === "won" ? "🏆 بطل الأبطال!" : "💀 محاولة جيدة.."}</h2>
+                <button onClick={() => window.location.reload()} className="rounded-xl bg-white px-8 py-3 font-bold text-slate-900 shadow-lg hover:bg-yellow-400 transition">
+                  إعادة المحاولة
+                </button>
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur min-h-[300px]">
+             <h3 className="text-xl font-bold mb-4">🏆 قائمة المتصدرين</h3>
+             <p className="text-white/40 text-center mt-10 italic">سيتم تسجيل نتيجتك فور الانتهاء...</p>
+          </section>
+        </main>
       </div>
 
-      {/* شاشة الدخول (التي تفعل الموسيقى عند الضغط) */}
+      {/* شاشة الدخول الإلزامية لتفعيل الصوت */}
       {!playerName && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-6">
           <div className="w-full max-w-lg rounded-3xl border border-white/20 bg-slate-900 p-8 shadow-2xl text-center">
-            <h1 className="text-3xl font-black mb-6">دوري أبطال Gowin</h1>
+            <h2 className="text-3xl font-black text-white mb-6">مرحباً بك في Gowin</h2>
             <input 
               value={playerInput} 
               onChange={(e) => setPlayerInput(e.target.value)} 
-              placeholder="اكتب اسمك للمنافسة..." 
-              className="w-full rounded-2xl bg-white/10 p-4 text-center text-white border border-white/20 focus:outline-none mb-6"
+              placeholder="اكتب اسمك هنا..." 
+              className="w-full rounded-2xl bg-white/10 p-4 text-center text-white border border-white/20 focus:outline-none mb-6 text-xl"
             />
             <button 
               onClick={handleStart} 
-              className="w-full rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 p-4 font-bold text-slate-900 text-xl shadow-xl hover:scale-105 transition-transform"
+              className="w-full rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 p-5 font-bold text-slate-900 text-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
             >
               🚀 ابدأ اللعب
             </button>
+            <p className="text-white/40 mt-4 text-sm">بمجرد الضغط على ابدأ، ستعمل موسيقى الخلفية</p>
           </div>
-        </div>
-      )}
-
-      {/* مشغل يوتيوب المخفي - تم تصحيح الرابط ليعمل على المتصفحات */}
-      {youtubeMusicStarted && (
-        <div style={{ position: 'absolute', top: '-1000px', left: '-1000px', width: '1px', height: '1px', overflow: 'hidden' }}>
-          <iframe
-            width="100"
-            height="100"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&mute=0`}
-            title="Background Music"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            style={{ border: 'none' }}
-          ></iframe>
         </div>
       )}
     </div>
   );
 };
+
+export default App;
